@@ -1,6 +1,6 @@
-# Standalone Arcium Voting Examples
+# Standalone Arcium Voting Example
 
-My intention here is to fix all the warnings,
+My intention here is to fix all the warnings and do a video based on the code once I can get it to work reliably.
 
 ## To Run
 
