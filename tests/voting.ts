@@ -2,6 +2,7 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { Voting } from "../target/types/voting";
+import { setTimeout } from "timers/promises";
 import { randomBytes } from "crypto";
 import {
   awaitComputationFinalization,
@@ -450,7 +451,7 @@ async function getMXEPublicKeyWithRetry(
       console.log(
         `Retrying in ${retryDelayMs}ms... (attempt ${attempt}/${maxRetries})`
       );
-      await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+      await setTimeout(retryDelayMs);
     }
   }
 
