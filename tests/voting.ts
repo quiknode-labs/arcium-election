@@ -269,6 +269,7 @@ describe("Voting", () => {
       .signers([owner])
       .rpc({
         commitment: "confirmed",
+        preflightCommitment: "confirmed",
       });
     console.log("Init vote stats computation definition transaction", sig);
 
@@ -328,6 +329,7 @@ describe("Voting", () => {
       .signers([owner])
       .rpc({
         commitment: "confirmed",
+        preflightCommitment: "confirmed",
       });
     console.log("Init vote computation definition transaction", sig);
 
@@ -390,6 +392,7 @@ describe("Voting", () => {
       .signers([owner])
       .rpc({
         commitment: "confirmed",
+        preflightCommitment: "confirmed",
       });
     console.log("Init reveal result computation definition transaction", sig);
 
