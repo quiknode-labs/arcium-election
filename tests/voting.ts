@@ -22,7 +22,7 @@ import {
   getComputationAccAddress,
   getMXEPublicKey,
 } from "@arcium-hq/client";
-import * as fs from "fs";
+import * as fs from "fs/promises";
 import * as os from "os";
 import { expect } from "chai";
 import { getKeypairFromFile } from "@solana-developers/helpers"
@@ -281,7 +281,7 @@ describe("Voting", () => {
     console.log("Init vote stats computation definition transaction", sig);
 
     if (uploadRawCircuit) {
-      const rawCircuit = fs.readFileSync("build/init_vote_stats.arcis");
+      const rawCircuit = await fs.readFile("build/init_vote_stats.arcis");
 
       await uploadCircuit(
         provider as anchor.AnchorProvider,
@@ -341,7 +341,7 @@ describe("Voting", () => {
     console.log("Init vote computation definition transaction", sig);
 
     if (uploadRawCircuit) {
-      const rawCircuit = fs.readFileSync("build/vote.arcis");
+      const rawCircuit = await fs.readFile("build/vote.arcis");
 
       await uploadCircuit(
         provider as anchor.AnchorProvider,
@@ -404,7 +404,7 @@ describe("Voting", () => {
     console.log("Init reveal result computation definition transaction", sig);
 
     if (uploadRawCircuit) {
-      const rawCircuit = fs.readFileSync("build/reveal_result.arcis");
+      const rawCircuit = await fs.readFile("build/reveal_result.arcis");
 
       await uploadCircuit(
         provider as anchor.AnchorProvider,
