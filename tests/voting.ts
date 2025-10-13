@@ -126,7 +126,7 @@ describe("Voting", () => {
         })
         .rpc({ skipPreflight: true, commitment: "confirmed" });
 
-      console.log(`Poll ${POLL_ID} created with signature`, pollSig);
+      console.log(`🆕 Poll ${POLL_ID} created with signature`, pollSig);
 
       const finalizePollSig = await awaitComputationFinalization(
         provider as anchor.AnchorProvider,
@@ -134,7 +134,7 @@ describe("Voting", () => {
         program.programId,
         "confirmed"
       );
-      console.log(`Finalize poll ${POLL_ID} sig is `, finalizePollSig);
+      console.log(`Finalize poll ${POLL_ID} signature is `, finalizePollSig);
     }
 
     // Cast votes for each poll with different outcomes
@@ -177,7 +177,7 @@ describe("Voting", () => {
           authority: owner.publicKey,
         })
         .rpc({ skipPreflight: true, commitment: "confirmed" });
-      console.log(`Queue vote for poll ${POLL_ID} sig is `, queueVoteSig);
+      console.log(`Queue vote for poll ${POLL_ID} signature is `, queueVoteSig);
 
       const finalizeSig = await awaitComputationFinalization(
         provider as anchor.AnchorProvider,
@@ -185,11 +185,11 @@ describe("Voting", () => {
         program.programId,
         "confirmed"
       );
-      console.log(`Finalize vote for poll ${POLL_ID} sig is `, finalizeSig);
+      console.log(`Finalize vote for poll ${POLL_ID} signature is `, finalizeSig);
 
       const voteEvent = await voteEventPromise;
       console.log(
-        `Vote casted for poll ${POLL_ID} at timestamp `,
+        `🗳️ Vote cast for poll ${POLL_ID} at timestamp `,
         voteEvent.timestamp.toString()
       );
     }
@@ -203,7 +203,7 @@ describe("Voting", () => {
 
       const revealComputationOffset = new anchor.BN(randomBytes(8), "hex");
 
-      const revealQueueSig = await program.methods
+      const revealQueueSignature = await program.methods
         .revealResult(revealComputationOffset, POLL_ID)
         .accountsPartial({
           computationAccount: getComputationAccAddress(
@@ -220,7 +220,7 @@ describe("Voting", () => {
           ),
         })
         .rpc({ skipPreflight: true, commitment: "confirmed" });
-      console.log(`Reveal queue for poll ${POLL_ID} sig is `, revealQueueSig);
+      console.log(`Reveal queue for poll ${POLL_ID} signature is `, revealQueueSignature);
 
       const revealFinalizeSig = await awaitComputationFinalization(
         provider as anchor.AnchorProvider,
@@ -229,13 +229,13 @@ describe("Voting", () => {
         "confirmed"
       );
       console.log(
-        `Reveal finalize for poll ${POLL_ID} sig is `,
+        `Reveal finalize for poll ${POLL_ID} signature is `,
         revealFinalizeSig
       );
 
       const revealEvent = await revealEventPromise;
       console.log(
-        `Decrypted winner for poll ${POLL_ID} is `,
+        `🏆 Decrypted winner for poll ${POLL_ID} is `,
         revealEvent.output
       );
       expect(revealEvent.output).to.equal(expectedOutcome);
