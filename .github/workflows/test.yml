@@ -17,7 +17,9 @@ jobs:
       - name: Setup Solana and Anchor
         uses: metadaoproject/setup-anchor@main
         with:
-          anchor-version: '0.32.0'
+          # As of 20251013 Arcium still isn't updated for latest Anchor 0.32.1 yet
+          # TODO: fix and update
+          anchor-version: '0.31.1'
           solana-cli-version: '3.0.6' 
           node-version: '22.20.0'
 
