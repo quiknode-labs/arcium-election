@@ -37,9 +37,9 @@ describe("Voting", () => {
   type Event = anchor.IdlEvents<(typeof program)["idl"]>;
   const awaitEvent = async <E extends keyof Event>(eventName: E) => {
     let listenerId: number;
-    const event = await new Promise<Event[E]>((res) => {
+    const event = await new Promise<Event[E]>((resolve) => {
       listenerId = program.addEventListener(eventName, (event) => {
-        res(event);
+        resolve(event);
       });
     });
     await program.removeEventListener(listenerId);
