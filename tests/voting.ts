@@ -25,6 +25,7 @@ import {
 import * as fs from "fs";
 import * as os from "os";
 import { expect } from "chai";
+import { getKeypairFromFile } from "@solana-developers/helpers"
 
 const SECONDS = 1000;
 
@@ -51,7 +52,7 @@ describe("Voting", () => {
 
   it("can vote on polls!", async () => {
     const POLL_IDS = [420, 421, 422];
-    const owner = readKpJson(`${os.homedir()}/.config/solana/id.json`);
+    const owner = await getKeypairFromFile(`${os.homedir()}/.config/solana/id.json`);
 
     const mxePublicKey = await getMXEPublicKeyWithRetry(
       provider as anchor.AnchorProvider,
@@ -460,9 +461,4 @@ async function getMXEPublicKeyWithRetry(
   );
 }
 
-function readKpJson(path: string): anchor.web3.Keypair {
-  const file = fs.readFileSync(path);
-  return anchor.web3.Keypair.fromSecretKey(
-    new Uint8Array(JSON.parse(file.toString()))
-  );
-}
+
