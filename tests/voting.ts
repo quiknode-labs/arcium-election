@@ -24,8 +24,9 @@ import {
 } from "@arcium-hq/client";
 import * as fs from "fs/promises";
 import * as os from "os";
-import { expect } from "chai";
 import { getKeypairFromFile } from "@solana-developers/helpers"
+import { describe, it } from "node:test";
+import assert from "node:assert";
 
 const SECONDS = 1000;
 
@@ -238,12 +239,12 @@ describe("Voting", () => {
         `🏆 Decrypted winner for poll ${POLL_ID} is `,
         revealEvent.output
       );
-      expect(revealEvent.output).to.equal(expectedOutcome);
+      assert.equal(revealEvent.output, expectedOutcome);
     }
     // Specify a slow test timeout of 30 seconds to show anything below 15 seconds as green.
     // On my MBP this test takes 11 seconds
     // See https://mochajs.org/#test-duration
-  }).slow(30 * SECONDS);;
+  });
 
   async function initVoteStatsCompDef(
     program: Program<Voting>,

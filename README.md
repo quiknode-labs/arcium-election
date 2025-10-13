@@ -7,9 +7,11 @@ Blah
 ## To Run
 
 - Install Arcium
+- Use older Anchor 
+`avm use 0.31.1`
 - Get Docker https://docs.docker.com/desktop/setup/install/mac-install/
 - Start Docker desktop (docker daemon not running)
-- unset RUSTUP_TOOLCHAIN
+- `unset RUSTUP_TOOLCHAIN`
 - arcium build
 - arcium test
 
