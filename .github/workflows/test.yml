@@ -6,31 +6,14 @@ on:
   pull_request:
     branches: [ main ]
 
+# From https://github.com/arcium-hq/setup-arcium
 jobs:
-  test:
+  run-arcium-build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Solana and Anchor
-        uses: metadaoproject/setup-anchor@main
+      - uses: actions/checkout@v3
+      - uses: arcium-hq/setup-arcium@v0.3.0
         with:
-          # As of 20251013 Arcium still isn't updated for latest Anchor 0.32.1 yet
-          # TODO: fix and update
-          anchor-version: '0.31.1'
-          solana-cli-version: '3.0.6' 
-          node-version: '22.20.0'
-
-      - name: Install Yarn
-        run: npm install -g yarn
-
-      - name: Install dependencies
-        run: yarn install
-
-      - name: Install Arcium CLI
-        run: curl --proto '=https' --tlsv1.2 -sSfL https://install.arcium.com/ | bash
-
-      - name: Run tests
-        run: arcium test
+          runner-arch-os: x86_64_linux
+      - run: arcium build
+        shell: bash
