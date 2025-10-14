@@ -9,9 +9,12 @@ Blah
 - Install Arcium
 - Use older Anchor 
 `avm use 0.31.1`
+- use custom version of Rust Arcium wants:
+- `unset RUSTUP_TOOLCHAIN`
+
 - Get Docker https://docs.docker.com/desktop/setup/install/mac-install/
 - Start Docker desktop (docker daemon not running)
-- `unset RUSTUP_TOOLCHAIN`
+
 - arcium build
 - arcium test
 

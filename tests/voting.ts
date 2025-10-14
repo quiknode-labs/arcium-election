@@ -138,7 +138,7 @@ describe("Voting", () => {
       console.log(`Finalize poll ${POLL_ID} signature is `, finalizePollSig);
     }
 
-    // Cast votes for each poll with different outcomes
+    // Cast votes for each poll for different outcomes
     const voteOutcomes = [true, false, true]; // Different outcomes for each poll
     for (let i = 0; i < POLL_IDS.length; i++) {
       const POLL_ID = POLL_IDS[i];
