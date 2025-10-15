@@ -51,7 +51,12 @@ describe("Voting", () => {
 
 
   it("can vote on polls!", async () => {
-    const POLL_IDS = [420, 421, 422];
+    const pollsAndChoices = [
+      { id: 420, choice: true },
+      { id: 421, choice: false },
+      { id: 422, choice: true },
+    ];
+
     const owner = await getKeypairFromFile(`${os.homedir()}/.config/solana/id.json`);
 
     const { privateKey, publicKey, sharedSecret } = await makeClientSideKeys(provider as anchor.AnchorProvider, program.programId);
@@ -91,7 +96,7 @@ describe("Voting", () => {
     const cipher = new RescueCipher(sharedSecret);
 
     // Create multiple polls
-    for (const POLL_ID of POLL_IDS) {
+    for (const { id: POLL_ID } of pollsAndChoices) {
       const pollNonce = randomBytes(16);
 
       const pollComputationOffset = getRandomBigNumber();
@@ -131,11 +136,9 @@ describe("Voting", () => {
     }
 
     // Cast votes for each poll for different outcomes
-    const voteOutcomes = [true, false, true]; // Different outcomes for each poll
-    for (let i = 0; i < POLL_IDS.length; i++) {
-      const POLL_ID = POLL_IDS[i];
-      const vote = BigInt(voteOutcomes[i]);
-      const plaintext = [vote];
+
+    for (const { id: POLL_ID, choice } of pollsAndChoices) {
+      const plaintext = [BigInt(choice)];
 
       const nonce = randomBytes(16);
       const ciphertext = cipher.encrypt(plaintext, nonce);
@@ -180,15 +183,13 @@ describe("Voting", () => {
 
       const voteEvent = await awaitEvent("voteEvent");
       console.log(
-        `🗳️ Voted ${vote} for poll ${POLL_ID} at timestamp `,
+        `🗳️ Voted ${choice} for poll ${POLL_ID} at timestamp `,
         voteEvent.timestamp.toString()
       );
     }
 
     // Reveal results for each poll
-    for (let i = 0; i < POLL_IDS.length; i++) {
-      const POLL_ID = POLL_IDS[i];
-      const expectedOutcome = voteOutcomes[i];
+    for (const { id: POLL_ID, choice: expectedOutcome } of pollsAndChoices) {
 
       const revealEventPromise = awaitEvent("revealResultEvent");
 
