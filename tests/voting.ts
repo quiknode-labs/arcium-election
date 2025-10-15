@@ -147,6 +147,9 @@ describe("Voting", () => {
 
       const voteComputationOffset = getRandomBigNumber();
 
+      // Needs to be awaited before queueing the vote
+      const voteEventPromise = awaitEvent("voteEvent");
+
       const queueVoteSig = await program.methods
         .vote(
           voteComputationOffset,
@@ -181,7 +184,7 @@ describe("Voting", () => {
       );
       console.log(`Finalize vote for poll ${POLL_ID} signature is `, finalizeSig);
 
-      const voteEvent = await awaitEvent("voteEvent");
+      const voteEvent = await voteEventPromise;
       console.log(
         `🗳️ Voted ${choice} for poll ${POLL_ID} at timestamp `,
         voteEvent.timestamp.toString()
