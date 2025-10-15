@@ -2,7 +2,6 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { Voting } from "../target/types/voting";
-import { setTimeout } from "timers/promises";
 import { randomBytes } from "crypto";
 import {
   awaitComputationFinalization,
@@ -18,15 +17,14 @@ import {
   getMempoolAccAddress,
   getCompDefAccAddress,
   getExecutingPoolAccAddress,
-  x25519,
   getComputationAccAddress,
-  getMXEPublicKey,
 } from "@arcium-hq/client";
 import * as fs from "fs/promises";
 import * as os from "os";
 import { getKeypairFromFile } from "@solana-developers/helpers"
 import { describe, it } from "node:test";
 import assert from "node:assert";
+import { getRandomBigNumber, makeClientSideKeys } from "./helpers";
 
 const SECONDS = 1000;
 
@@ -51,16 +49,12 @@ describe("Voting", () => {
 
   const arciumEnv = getArciumEnv();
 
+
   it("can vote on polls!", async () => {
     const POLL_IDS = [420, 421, 422];
     const owner = await getKeypairFromFile(`${os.homedir()}/.config/solana/id.json`);
 
-    const mxePublicKey = await getMXEPublicKeyWithRetry(
-      provider as anchor.AnchorProvider,
-      program.programId
-    );
-
-    console.log("MXE x25519 pubkey is", mxePublicKey);
+    const { privateKey, publicKey, sharedSecret } = await makeClientSideKeys(provider as anchor.AnchorProvider, program.programId);
 
     console.log("Initializing vote stats computation definition");
     const initVoteStatsSig = await initVoteStatsCompDef(
@@ -93,16 +87,14 @@ describe("Voting", () => {
       initRRSig
     );
 
-    const privateKey = x25519.utils.randomSecretKey();
-    const publicKey = x25519.getPublicKey(privateKey);
-    const sharedSecret = x25519.getSharedSecret(privateKey, mxePublicKey);
+
     const cipher = new RescueCipher(sharedSecret);
 
     // Create multiple polls
     for (const POLL_ID of POLL_IDS) {
       const pollNonce = randomBytes(16);
 
-      const pollComputationOffset = new anchor.BN(randomBytes(8), "hex");
+      const pollComputationOffset = getRandomBigNumber();
 
       const pollSig = await program.methods
         .createNewPoll(
@@ -148,11 +140,9 @@ describe("Voting", () => {
       const nonce = randomBytes(16);
       const ciphertext = cipher.encrypt(plaintext, nonce);
 
-      const voteEventPromise = awaitEvent("voteEvent");
-
       console.log(`Voting for poll ${POLL_ID}`);
 
-      const voteComputationOffset = new anchor.BN(randomBytes(8), "hex");
+      const voteComputationOffset = getRandomBigNumber();
 
       const queueVoteSig = await program.methods
         .vote(
@@ -188,9 +178,9 @@ describe("Voting", () => {
       );
       console.log(`Finalize vote for poll ${POLL_ID} signature is `, finalizeSig);
 
-      const voteEvent = await voteEventPromise;
+      const voteEvent = await awaitEvent("voteEvent");
       console.log(
-        `🗳️ Vote cast for poll ${POLL_ID} at timestamp `,
+        `🗳️ Voted ${vote} for poll ${POLL_ID} at timestamp `,
         voteEvent.timestamp.toString()
       );
     }
@@ -202,7 +192,7 @@ describe("Voting", () => {
 
       const revealEventPromise = awaitEvent("revealResultEvent");
 
-      const revealComputationOffset = new anchor.BN(randomBytes(8), "hex");
+      const revealComputationOffset = getRandomBigNumber();
 
       const revealQueueSignature = await program.methods
         .revealResult(revealComputationOffset, POLL_ID)
@@ -433,33 +423,6 @@ describe("Voting", () => {
   }
 });
 
-async function getMXEPublicKeyWithRetry(
-  provider: anchor.AnchorProvider,
-  programId: PublicKey,
-  maxRetries: number = 10,
-  retryDelayMs: number = 500
-): Promise<Uint8Array> {
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      const mxePublicKey = await getMXEPublicKey(provider, programId);
-      if (mxePublicKey) {
-        return mxePublicKey;
-      }
-    } catch (error) {
-      console.log(`Attempt ${attempt} failed to fetch MXE public key:`, error);
-    }
 
-    if (attempt < maxRetries) {
-      console.log(
-        `Retrying in ${retryDelayMs}ms... (attempt ${attempt}/${maxRetries})`
-      );
-      await setTimeout(retryDelayMs);
-    }
-  }
-
-  throw new Error(
-    `Failed to fetch MXE public key after ${maxRetries} attempts`
-  );
-}
 
 

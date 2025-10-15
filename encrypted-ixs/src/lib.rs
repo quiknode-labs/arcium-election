@@ -5,6 +5,7 @@ mod circuits {
     use arcis_imports::*;
 
     /// Tracks the encrypted vote tallies for a poll.
+    /// TODO: just call this 'Poll'
     pub struct VoteStats {
         yes: u64,
         no: u64,
