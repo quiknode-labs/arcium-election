@@ -1,0 +1,4 @@
+// Silence Rust Analyzer warning about encrypted-ixs (SpacemanDev)
+{
+    "rust-analyzer.procMacro.enable": false
+}
