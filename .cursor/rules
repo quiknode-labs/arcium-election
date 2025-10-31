@@ -2,7 +2,7 @@
 
 - The project uses Arcium. Arcium is documented at https://docs.arcium.com/developers 
 
-- Before you say 'SUCCESS', or celebrate, run 'arcium test'. If the tests fail you have more work to do. 
+- Before you say 'SUCCESS', or celebrate, run `run-tests.bash`. If the tests fail you have more work to do. 
 
 - If you show this symbol '✅' and there is more work to do, add a '❌' for each remaining work item. 
 
@@ -19,7 +19,7 @@
 
 - The code you are making is for production. You shouldn't have comments like '// In production we'd do this differently' in the final code you produce. 
 
-- Don't stop until 'arcium test' passes on the code you have made.
+- Don't stop until `run-tests.bash` passes on the code you have made.
 
 - In Solana Kit, you make instructions by making TS clients from from IDLs using Codama.\
 
