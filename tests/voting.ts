@@ -26,8 +26,6 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import { getRandomBigNumber, makeClientSideKeys } from "./helpers";
 
-const SECONDS = 1000;
-
 describe("Voting", () => {
   // Configure the client to use the local cluster.
   anchor.setProvider(anchor.AnchorProvider.env());
@@ -50,11 +48,12 @@ describe("Voting", () => {
   const arciumEnv = getArciumEnv();
 
 
-  it("can vote on polls!", async () => {
+  it("users can vote on polls!", async () => {
+    // Vote options: 0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com
     const pollsAndChoices = [
-      { id: 420, choice: true },
-      { id: 421, choice: false },
-      { id: 422, choice: true },
+      { id: 420, choice: 0 }, // Neo robot
+      { id: 421, choice: 1 }, // Humane AI PIN
+      { id: 422, choice: 2 }, // friend.com
     ];
 
     const owner = await getKeypairFromFile(`${os.homedir()}/.config/solana/id.json`);
@@ -136,6 +135,7 @@ describe("Voting", () => {
     }
 
     // Cast votes for each poll for different outcomes
+    const optionNames = ["Neo robot", "Humane AI PIN", "friend.com"];
 
     for (const { id: POLL_ID, choice } of pollsAndChoices) {
       const plaintext = [BigInt(choice)];
@@ -143,7 +143,7 @@ describe("Voting", () => {
       const nonce = randomBytes(16);
       const ciphertext = cipher.encrypt(plaintext, nonce);
 
-      console.log(`Voting for poll ${POLL_ID}`);
+      console.log(`Voting for poll ${POLL_ID}: ${optionNames[choice]}`);
 
       const voteComputationOffset = getRandomBigNumber();
 
@@ -186,7 +186,7 @@ describe("Voting", () => {
 
       const voteEvent = await voteEventPromise;
       console.log(
-        `🗳️ Voted ${choice} for poll ${POLL_ID} at timestamp `,
+        `🗳️ Voted ${optionNames[choice]} (${choice}) for poll ${POLL_ID} at timestamp `,
         voteEvent.timestamp.toString()
       );
     }
@@ -230,8 +230,7 @@ describe("Voting", () => {
 
       const revealEvent = await revealEventPromise;
       console.log(
-        `🏆 Decrypted winner for poll ${POLL_ID} is `,
-        revealEvent.output
+        `🏆 Decrypted winner for poll ${POLL_ID} is ${optionNames[revealEvent.output]} (${revealEvent.output})`
       );
       assert.equal(revealEvent.output, expectedOutcome);
     }

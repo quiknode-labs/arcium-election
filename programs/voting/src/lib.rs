@@ -49,13 +49,13 @@ pub mod voting {
         ctx.accounts.poll_acc.id = id;
         ctx.accounts.poll_acc.authority = ctx.accounts.payer.key();
         ctx.accounts.poll_acc.nonce = nonce;
-        ctx.accounts.poll_acc.vote_state = [[0; 32]; 2];
+        ctx.accounts.poll_acc.vote_state = [[0; 32]; 3];
 
         let args = vec![Argument::PlaintextU128(nonce)];
 
         ctx.accounts.sign_pda_account.bump = ctx.bumps.sign_pda_account;
 
-        // Initialize encrypted vote counters (yes/no) through MPC
+        // Initialize encrypted vote counters (3 options) through MPC
         queue_computation(
             ctx.accounts,
             computation_offset,
@@ -93,12 +93,12 @@ pub mod voting {
 
     /// Submits an encrypted vote to the poll.
     ///
-    /// This function allows a voter to cast their vote (yes/no) in encrypted form.
+    /// This function allows a voter to cast their vote (0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com) in encrypted form.
     /// The vote is added to the running tally through MPC computation, ensuring
     /// that individual votes remain confidential while updating the overall count.
     ///
     /// # Arguments
-    /// * `vote` - Encrypted vote (true for yes, false for no)
+    /// * `vote` - Encrypted vote (0, 1, or 2 for the three options)
     /// * `vote_encryption_pubkey` - Voter's public key for encryption
     /// * `vote_nonce` - Cryptographic nonce for the vote encryption
     pub fn vote(
@@ -112,13 +112,13 @@ pub mod voting {
         let args = vec![
             Argument::ArcisPubkey(vote_encryption_pubkey),
             Argument::PlaintextU128(vote_nonce),
-            Argument::EncryptedBool(vote),
+            Argument::EncryptedU8(vote),
             Argument::PlaintextU128(ctx.accounts.poll_acc.nonce),
             Argument::Account(
                 ctx.accounts.poll_acc.key(),
                 // Offset calculation: 8 bytes (discriminator) + 1 byte (bump)
                 8 + 1,
-                32 * 2, // 2 vote counters (yes/no), each stored as 32-byte ciphertext
+                32 * 3, // 3 vote counters (Neo robot, Humane AI PIN, friend.com), each stored as 32-byte ciphertext
             ),
         ];
 
@@ -168,8 +168,7 @@ pub mod voting {
     /// Reveals the final result of the poll.
     ///
     /// Only the poll authority can call this function to decrypt and reveal the vote tallies.
-    /// The MPC computation compares the yes and no vote counts and returns whether
-    /// the majority voted yes (true) or no (false).
+    /// The MPC computation compares all three vote counts and returns the winning option.
     ///
     /// # Arguments
     /// * `id` - The poll ID to reveal results for
@@ -191,7 +190,7 @@ pub mod voting {
                 ctx.accounts.poll_acc.key(),
                 // Offset calculation: 8 bytes (discriminator) + 1 byte (bump)
                 8 + 1,
-                32 * 2, // 2 encrypted vote counters (yes/no), 32 bytes each
+                32 * 3, // 3 encrypted vote counters (Neo robot, Humane AI PIN, friend.com), 32 bytes each
             ),
         ];
 
@@ -528,8 +527,8 @@ pub struct InitRevealResultCompDef<'info> {
 pub struct PollAccount {
     /// PDA bump seed
     pub bump: u8,
-    /// Encrypted vote counters: [yes_count, no_count] as 32-byte ciphertexts
-    pub vote_state: [[u8; 32]; 2],
+    /// Encrypted vote counters: [neo_robot_count, humane_ai_pin_count, friend_com_count] as 32-byte ciphertexts
+    pub vote_state: [[u8; 32]; 3],
     /// Unique identifier for this poll
     pub id: u32,
     /// Public key of the poll creator (only they can reveal results)
@@ -558,5 +557,6 @@ pub struct VoteEvent {
 
 #[event]
 pub struct RevealResultEvent {
-    pub output: bool,
+    /// The winning option: 0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com
+    pub output: u8,
 }

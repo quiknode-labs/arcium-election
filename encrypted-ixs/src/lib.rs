@@ -5,35 +5,41 @@ mod circuits {
     use arcis_imports::*;
 
     /// Tracks the encrypted vote tallies for a poll.
-    /// TODO: just call this 'Poll'
+    /// Three voting options: 0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com
     pub struct VoteStats {
-        yes: u64,
-        no: u64,
+        neo_robot: u64,
+        humane_ai_pin: u64,
+        friend_com: u64,
     }
 
     /// Represents a single encrypted vote.
+    /// 0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com
     pub struct UserVote {
-        vote: bool,
+        vote: u8,
     }
 
     /// Initializes encrypted vote counters for a new poll.
     ///
-    /// Creates a VoteStats structure with zero counts for both yes and no votes.
+    /// Creates a VoteStats structure with zero counts for all three voting options.
     /// The counters remain encrypted and can only be updated through MPC operations.
     #[instruction]
     pub fn init_vote_stats(mxe: Mxe) -> Enc<Mxe, VoteStats> {
-        let vote_stats = VoteStats { yes: 0, no: 0 };
+        let vote_stats = VoteStats {
+            neo_robot: 0,
+            humane_ai_pin: 0,
+            friend_com: 0,
+        };
         mxe.from_arcis(vote_stats)
     }
 
     /// Processes an encrypted vote and updates the running tallies.
     ///
-    /// Takes an individual vote and adds it to the appropriate counter (yes or no)
+    /// Takes an individual vote and adds it to the appropriate counter
     /// without revealing the vote value. The updated vote statistics remain encrypted
     /// and can only be revealed by the poll authority.
     ///
     /// # Arguments
-    /// * `vote_ctxt` - The encrypted vote to be counted
+    /// * `vote_ctxt` - The encrypted vote to be counted (0, 1, or 2)
     /// * `vote_stats_ctxt` - Current encrypted vote tallies
     ///
     /// # Returns
@@ -47,10 +53,12 @@ mod circuits {
         let mut vote_stats = vote_stats_ctxt.to_arcis();
 
         // Increment appropriate counter based on vote value
-        if user_vote.vote {
-            vote_stats.yes += 1;
+        if user_vote.vote == 0 {
+            vote_stats.neo_robot += 1;
+        } else if user_vote.vote == 1 {
+            vote_stats.humane_ai_pin += 1;
         } else {
-            vote_stats.no += 1;
+            vote_stats.friend_com += 1;
         }
 
         vote_stats_ctxt.owner.from_arcis(vote_stats)
@@ -58,18 +66,32 @@ mod circuits {
 
     /// Reveals the final result of the poll by comparing vote tallies.
     ///
-    /// Decrypts the vote counters and determines whether the majority voted yes or no.
-    /// Only the final result (majority decision) is revealed, not the actual vote counts.
+    /// Decrypts the vote counters and determines which option received the most votes.
+    /// Only the final result (winner) is revealed, not the actual vote counts.
     ///
     /// # Arguments
     /// * `vote_stats_ctxt` - Encrypted vote tallies to be revealed
     ///
     /// # Returns
-    /// * `true` if more people voted yes than no
-    /// * `false` if more people voted no than yes (or tie)
+    /// The winning option: 0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com
+    /// In case of a tie, returns the option with the lower index that tied.
     #[instruction]
-    pub fn reveal_result(vote_stats_ctxt: Enc<Mxe, VoteStats>) -> bool {
+    pub fn reveal_result(vote_stats_ctxt: Enc<Mxe, VoteStats>) -> u8 {
         let vote_stats = vote_stats_ctxt.to_arcis();
-        (vote_stats.yes > vote_stats.no).reveal()
+        
+        // Reveal all vote counts first (must be unconditional)
+        let neo_count = vote_stats.neo_robot.reveal();
+        let humane_count = vote_stats.humane_ai_pin.reveal();
+        let friend_count = vote_stats.friend_com.reveal();
+        
+        // Find the maximum value and return its index
+        // Compare all three and return the winner (0, 1, or 2)
+        if neo_count >= humane_count && neo_count >= friend_count {
+            0u8
+        } else if humane_count >= friend_count {
+            1u8
+        } else {
+            2u8
+        }
     }
 }
