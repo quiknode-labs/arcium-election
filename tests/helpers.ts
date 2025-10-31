@@ -5,12 +5,12 @@ import { PublicKey } from "@solana/web3.js";
 import { setTimeout } from "timers/promises";
 import { randomBytes } from "crypto";
 
-export const getMXEPublicKeyWithRetry = async function (
+export const getMXEPublicKeyWithRetry = async (
   provider: anchor.AnchorProvider,
   programId: PublicKey,
   maxRetries: number = 10,
   retryDelayMs: number = 500
-): Promise<Uint8Array> {
+): Promise<Uint8Array> => {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       const mxePublicKey = await getMXEPublicKey(provider, programId);
@@ -34,7 +34,7 @@ export const getMXEPublicKeyWithRetry = async function (
   );
 }
 
-export const makeClientSideKeys = async function (provider: anchor.AnchorProvider, programId: PublicKey) {
+export const makeClientSideKeys = async (provider: anchor.AnchorProvider, programId: PublicKey) => {
 
   const mxePublicKey = await getMXEPublicKeyWithRetry(
     provider,

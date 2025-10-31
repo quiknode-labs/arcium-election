@@ -104,6 +104,7 @@ describe("Voting", () => {
       );
       console.log(`Finalize poll ${pollId} signature is `, finalizePollSignature);
     }
+    console.log("✅ Polls created");
   });
 
   test("users can vote on polls!", async () => {
@@ -121,18 +122,18 @@ describe("Voting", () => {
     const alicePollsAndChoices = [
       { pollId: 420, choice: VoteOption.NeoRobot },
       { pollId: 421, choice: VoteOption.HumaneAIPIN },
-      { pollId: 422, choice: VoteOption.NeoRobot }, // Alice votes NeoRobot for both polls 420 and 422
+      { pollId: 422, choice: VoteOption.NeoRobot },
     ];
 
     const bobPollsAndChoices = [
       { pollId: 420, choice: VoteOption.NeoRobot },
       { pollId: 421, choice: VoteOption.FriendCom },
-      { pollId: 422, choice: VoteOption.NeoRobot }, // Bob votes NeoRobot for both polls 420 and 422
+      { pollId: 422, choice: VoteOption.NeoRobot },
     ];
 
     const carolPollsAndChoices = [
       { pollId: 420, choice: VoteOption.HumaneAIPIN },
-      { pollId: 421, choice: VoteOption.HumaneAIPIN }, // Carol votes HumaneAIPIN for both polls 420 and 421
+      { pollId: 421, choice: VoteOption.HumaneAIPIN },
       { pollId: 422, choice: VoteOption.FriendCom },
     ];
 
@@ -300,12 +301,12 @@ describe("Voting", () => {
     }
   });
 
-  async function initVoteStatsCompDef(
+  const initVoteStatsCompDef = async (
     program: Program<Voting>,
     owner: anchor.web3.Keypair,
     uploadRawCircuit: boolean,
     offchainSource: boolean
-  ): Promise<string> {
+  ): Promise<string> => {
     const baseSeedCompDefAcc = getArciumAccountBaseSeed(
       "ComputationDefinitionAccount"
     );
@@ -363,12 +364,12 @@ describe("Voting", () => {
     return transactionSignature;
   }
 
-  async function initVoteCompDef(
+  const initVoteCompDef = async (
     program: Program<Voting>,
     owner: anchor.web3.Keypair,
     uploadRawCircuit: boolean,
     offchainSource: boolean
-  ): Promise<string> {
+  ): Promise<string> => {
     const baseSeedCompDefAcc = getArciumAccountBaseSeed(
       "ComputationDefinitionAccount"
     );
@@ -423,12 +424,12 @@ describe("Voting", () => {
     return transactionSignature;
   }
 
-  async function initRevealResultCompDef(
+  const initRevealResultCompDef = async (
     program: Program<Voting>,
     owner: anchor.web3.Keypair,
     uploadRawCircuit: boolean,
     offchainSource: boolean
-  ): Promise<string> {
+  ): Promise<string> => {
     const baseSeedCompDefAcc = getArciumAccountBaseSeed(
       "ComputationDefinitionAccount"
     );
