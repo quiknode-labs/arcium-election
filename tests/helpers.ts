@@ -1,5 +1,6 @@
 import { getMXEPublicKey, x25519 } from "@arcium-hq/client";
 import * as anchor from "@coral-xyz/anchor";
+import { Program } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { setTimeout } from "timers/promises";
 import { randomBytes } from "crypto";
@@ -51,3 +52,34 @@ export const makeClientSideKeys = async function (provider: anchor.AnchorProvide
 export const getRandomBigNumber = () => {
   return new anchor.BN(randomBytes(8), "hex")
 }
+
+/**
+ * Waits for a program event to be emitted and properly cleans up the event listener.
+ * 
+ * This helper exists because Anchor's event listeners must be manually removed to prevent
+ * memory leaks. Without proper cleanup, listeners accumulate over time, causing performance
+ * degradation and potential out-of-memory errors in long-running test suites. Additionally,
+ * this function provides type-safe event handling by ensuring the returned event matches
+ * the expected event name from the program's IDL.
+ * 
+ * @param program - The Anchor program instance to listen for events on
+ * @param eventName - The name of the event to wait for (must be a valid event name from the program's IDL)
+ * @returns A promise that resolves to the emitted event data, with proper type inference
+ */
+export const awaitEvent = async <
+  Idl extends anchor.Idl,
+  EventName extends keyof anchor.IdlEvents<Idl>
+>(
+  program: Program<Idl>,
+  eventName: EventName
+): Promise<anchor.IdlEvents<Idl>[EventName]> => {
+  let listenerId: number;
+  const event = await new Promise<anchor.IdlEvents<Idl>[EventName]>((resolve) => {
+    listenerId = program.addEventListener(eventName, (event) => {
+      resolve(event);
+    });
+  });
+  await program.removeEventListener(listenerId);
+
+  return event;
+};

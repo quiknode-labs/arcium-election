@@ -24,7 +24,7 @@ import * as os from "os";
 import { getKeypairFromFile } from "@solana-developers/helpers"
 import { describe, test, before } from "node:test";
 import assert from "node:assert";
-import { getRandomBigNumber, makeClientSideKeys } from "./helpers";
+import { getRandomBigNumber, makeClientSideKeys, awaitEvent } from "./helpers";
 
 describe("Voting", () => {
   // Configure the client to use the local cluster.
@@ -32,22 +32,9 @@ describe("Voting", () => {
   const program = anchor.workspace.Voting as Program<Voting>;
   const provider = anchor.getProvider();
 
-  type Event = anchor.IdlEvents<(typeof program)["idl"]>;
-  const awaitEvent = async <E extends keyof Event>(eventName: E) => {
-    let listenerId: number;
-    const event = await new Promise<Event[E]>((resolve) => {
-      listenerId = program.addEventListener(eventName, (event) => {
-        resolve(event);
-      });
-    });
-    await program.removeEventListener(listenerId);
-
-    return event;
-  };
-
   const arciumEnv = getArciumEnv();
 
-  // The Poll ID's we're going to create
+  // The Poll IDs we're going to create
   const pollIds = [420, 421, 422];
 
   // Vote options enum: 0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com
@@ -75,6 +62,48 @@ describe("Voting", () => {
     await initVoteStatsCompDef(program, owner, false, false);
     await initVoteCompDef(program, owner, false, false);
     await initRevealResultCompDef(program, owner, false, false);
+
+    // Create multiple polls (owner creates them) before tests run.
+    // Polls are on-chain accounts that persist, so they're created once and reused across tests.
+    // This setup phase creates all polls that will be used in the voting tests.
+    for (const pollId of pollIds) {
+      const pollNonce = randomBytes(16);
+
+      const pollComputationOffset = getRandomBigNumber();
+
+      const createPollSignature = await program.methods
+        .createNewPoll(
+          pollComputationOffset,
+          pollId,
+          `Poll ${pollId}: $SOL to 500?`,
+          new anchor.BN(deserializeLE(pollNonce).toString())
+        )
+        .accountsPartial({
+          computationAccount: getComputationAccAddress(
+            program.programId,
+            pollComputationOffset
+          ),
+          clusterAccount: arciumEnv.arciumClusterPubkey,
+          mxeAccount: getMXEAccAddress(program.programId),
+          mempoolAccount: getMempoolAccAddress(program.programId),
+          executingPool: getExecutingPoolAccAddress(program.programId),
+          compDefAccount: getCompDefAccAddress(
+            program.programId,
+            Buffer.from(getCompDefAccOffset("init_vote_stats")).readUInt32LE()
+          ),
+        })
+        .rpc({ skipPreflight: true, commitment: "confirmed" });
+
+      console.log(`🆕 Poll ${pollId} created with signature`, createPollSignature);
+
+      const finalizePollSignature = await awaitComputationFinalization(
+        provider as anchor.AnchorProvider,
+        pollComputationOffset,
+        program.programId,
+        "confirmed"
+      );
+      console.log(`Finalize poll ${pollId} signature is `, finalizePollSignature);
+    }
   });
 
   test("users can vote on polls!", async () => {
@@ -152,46 +181,6 @@ describe("Voting", () => {
     const bobCipher = new RescueCipher(bobKeys.sharedSecret);
     const carolCipher = new RescueCipher(carolKeys.sharedSecret);
 
-    // Create multiple polls (owner creates them)
-    for (const pollId of pollIds) {
-      const pollNonce = randomBytes(16);
-
-      const pollComputationOffset = getRandomBigNumber();
-
-      const createPollSignature = await program.methods
-        .createNewPoll(
-          pollComputationOffset,
-          pollId,
-          `Poll ${pollId}: $SOL to 500?`,
-          new anchor.BN(deserializeLE(pollNonce).toString())
-        )
-        .accountsPartial({
-          computationAccount: getComputationAccAddress(
-            program.programId,
-            pollComputationOffset
-          ),
-          clusterAccount: arciumEnv.arciumClusterPubkey,
-          mxeAccount: getMXEAccAddress(program.programId),
-          mempoolAccount: getMempoolAccAddress(program.programId),
-          executingPool: getExecutingPoolAccAddress(program.programId),
-          compDefAccount: getCompDefAccAddress(
-            program.programId,
-            Buffer.from(getCompDefAccOffset("init_vote_stats")).readUInt32LE()
-          ),
-        })
-        .rpc({ skipPreflight: true, commitment: "confirmed" });
-
-      console.log(`🆕 Poll ${pollId} created with signature`, createPollSignature);
-
-      const finalizePollSignature = await awaitComputationFinalization(
-        provider as anchor.AnchorProvider,
-        pollComputationOffset,
-        program.programId,
-        "confirmed"
-      );
-      console.log(`Finalize poll ${pollId} signature is `, finalizePollSignature);
-    }
-
     // Helper function to cast a vote
     const castVote = async (
       voter: Keypair,
@@ -208,7 +197,7 @@ describe("Voting", () => {
       console.log(`${voterName} voting for poll ${pollId}: ${getOptionName(choice)}`);
 
       const voteComputationOffset = getRandomBigNumber();
-      const voteEventPromise = awaitEvent("voteEvent");
+      const voteEventPromise = awaitEvent(program, "voteEvent");
 
       const queueVoteSignature = await program.methods
         .vote(
@@ -269,7 +258,7 @@ describe("Voting", () => {
     // Reveal results for each poll and verify against expected outcomes
     for (const { pollId, expectedOutcome } of expectedOutcomes) {
 
-      const revealEventPromise = awaitEvent("revealResultEvent");
+      const revealEventPromise = awaitEvent(program, "revealResultEvent");
 
       const revealComputationOffset = getRandomBigNumber();
 
