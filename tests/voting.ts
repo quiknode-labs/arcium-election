@@ -51,9 +51,9 @@ describe("Voting", () => {
   it("users can vote on polls!", async () => {
     // Vote options: 0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com
     const pollsAndChoices = [
-      { id: 420, choice: 0 }, // Neo robot
-      { id: 421, choice: 1 }, // Humane AI PIN
-      { id: 422, choice: 2 }, // friend.com
+      { pollId: 420, choice: 0 }, // Neo robot
+      { pollId: 421, choice: 1 }, // Humane AI PIN
+      { pollId: 422, choice: 2 }, // friend.com
     ];
 
     const owner = await getKeypairFromFile(`${os.homedir()}/.config/solana/id.json`);
@@ -95,7 +95,7 @@ describe("Voting", () => {
     const cipher = new RescueCipher(sharedSecret);
 
     // Create multiple polls
-    for (const { id: pollId } of pollsAndChoices) {
+    for (const { pollId } of pollsAndChoices) {
       const pollNonce = randomBytes(16);
 
       const pollComputationOffset = getRandomBigNumber();
@@ -137,7 +137,7 @@ describe("Voting", () => {
     // Cast votes for each poll for different outcomes
     const optionNames = ["Neo robot", "Humane AI PIN", "friend.com"];
 
-    for (const { id: pollId, choice } of pollsAndChoices) {
+    for (const { pollId, choice } of pollsAndChoices) {
       const plaintext = [BigInt(choice)];
 
       const nonce = randomBytes(16);
@@ -192,7 +192,7 @@ describe("Voting", () => {
     }
 
     // Reveal results for each poll
-    for (const { id: pollId, choice: expectedOutcome } of pollsAndChoices) {
+    for (const { pollId, choice: expectedOutcome } of pollsAndChoices) {
 
       const revealEventPromise = awaitEvent("revealResultEvent");
 
