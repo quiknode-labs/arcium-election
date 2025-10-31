@@ -51,7 +51,7 @@ pub mod voting {
         ctx.accounts.poll_acc.nonce = nonce;
         ctx.accounts.poll_acc.vote_state = [[0; 32]; 3];
 
-        let args = vec![Argument::PlaintextU128(nonce)];
+        let computation_args = vec![Argument::PlaintextU128(nonce)];
 
         ctx.accounts.sign_pda_account.bump = ctx.bumps.sign_pda_account;
 
@@ -59,7 +59,7 @@ pub mod voting {
         queue_computation(
             ctx.accounts,
             computation_offset,
-            args,
+            computation_args,
             None,
             vec![InitVoteStatsCallback::callback_ix(&[CallbackAccount {
                 pubkey: ctx.accounts.poll_acc.key(),
@@ -75,13 +75,13 @@ pub mod voting {
         ctx: Context<InitVoteStatsCallback>,
         output: ComputationOutputs<InitVoteStatsOutput>,
     ) -> Result<()> {
-        let o = match output {
+        let computation_result = match output {
             ComputationOutputs::Success(InitVoteStatsOutput { field_0 }) => field_0,
             _ => return Err(ErrorCode::AbortedComputation.into()),
         };
 
-        ctx.accounts.poll_acc.vote_state = o.ciphertexts;
-        ctx.accounts.poll_acc.nonce = o.nonce;
+        ctx.accounts.poll_acc.vote_state = computation_result.ciphertexts;
+        ctx.accounts.poll_acc.nonce = computation_result.nonce;
 
         Ok(())
     }
@@ -104,12 +104,12 @@ pub mod voting {
     pub fn vote(
         ctx: Context<Vote>,
         computation_offset: u64,
-        _id: u32,
+        poll_id: u32,
         vote: [u8; 32],
         vote_encryption_pubkey: [u8; 32],
         vote_nonce: u128,
     ) -> Result<()> {
-        let args = vec![
+        let computation_args = vec![
             Argument::ArcisPubkey(vote_encryption_pubkey),
             Argument::PlaintextU128(vote_nonce),
             Argument::EncryptedU8(vote),
@@ -127,7 +127,7 @@ pub mod voting {
         queue_computation(
             ctx.accounts,
             computation_offset,
-            args,
+            computation_args,
             None,
             vec![VoteCallback::callback_ix(&[CallbackAccount {
                 pubkey: ctx.accounts.poll_acc.key(),
@@ -142,13 +142,13 @@ pub mod voting {
         ctx: Context<VoteCallback>,
         output: ComputationOutputs<VoteOutput>,
     ) -> Result<()> {
-        let o = match output {
+        let vote_result = match output {
             ComputationOutputs::Success(VoteOutput { field_0 }) => field_0,
             _ => return Err(ErrorCode::AbortedComputation.into()),
         };
 
-        ctx.accounts.poll_acc.vote_state = o.ciphertexts;
-        ctx.accounts.poll_acc.nonce = o.nonce;
+        ctx.accounts.poll_acc.vote_state = vote_result.ciphertexts;
+        ctx.accounts.poll_acc.nonce = vote_result.nonce;
 
         let clock = Clock::get()?;
         let current_timestamp = clock.unix_timestamp;
@@ -184,7 +184,7 @@ pub mod voting {
 
         msg!("Revealing voting result for poll with id {}", id);
 
-        let args = vec![
+        let computation_args = vec![
             Argument::PlaintextU128(ctx.accounts.poll_acc.nonce),
             Argument::Account(
                 ctx.accounts.poll_acc.key(),
@@ -199,7 +199,7 @@ pub mod voting {
         queue_computation(
             ctx.accounts,
             computation_offset,
-            args,
+            computation_args,
             None,
             vec![RevealResultCallback::callback_ix(&[])],
         )?;
