@@ -22,7 +22,7 @@ import {
 import * as fs from "fs/promises";
 import * as os from "os";
 import { getKeypairFromFile } from "@solana-developers/helpers"
-import { describe, it } from "node:test";
+import { describe, test, before } from "node:test";
 import assert from "node:assert";
 import { getRandomBigNumber, makeClientSideKeys } from "./helpers";
 
@@ -47,20 +47,39 @@ describe("Voting", () => {
 
   const arciumEnv = getArciumEnv();
 
+  // The Poll ID's we're going to create
+  const pollIds = [420, 421, 422];
 
-  it("users can vote on polls!", async () => {
-    // Vote options enum: 0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com
-    enum VoteOption {
-      NeoRobot = 0,
-      HumaneAIPIN = 1,
-      FriendCom = 2,
-    }
+  // Vote options enum: 0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com
+  enum VoteOption {
+    NeoRobot = 0,
+    HumaneAIPIN = 1,
+    FriendCom = 2,
+  }
 
-    const OPTION_NAMES: Array<string> = ["Neo robot", "Humane AI PIN", "friend.com"];
-    const getOptionName = (index: number): string => OPTION_NAMES[index] ?? `Option ${index}`;
+  const OPTION_NAMES: Array<string> = ["Neo robot", "Humane AI PIN", "friend.com"];
 
-    // Define poll IDs
-    const pollIds = [420, 421, 422];
+  const getOptionName = (index: number): string => OPTION_NAMES[index] ?? `Option ${index}`;
+
+  // Owner keypair for creating polls and initializing computation definitions
+  let owner: anchor.web3.Keypair;
+
+  before(async () => {
+    owner = await getKeypairFromFile(`${os.homedir()}/.config/solana/id.json`);
+
+    // Computation definitions are persistent on-chain PDAs that register encrypted instructions
+    // (like "vote", "init_vote_stats", "reveal_result"). They must be initialized ONCE per
+    // deployment/test session. Re-initializing them in the same session would cause "account
+    // already in use" errors since the accounts already exist on-chain. This setup is separate
+    // from test logic and only needs to happen once before running any tests.
+    await initVoteStatsCompDef(program, owner, false, false);
+    await initVoteCompDef(program, owner, false, false);
+    await initRevealResultCompDef(program, owner, false, false);
+  });
+
+  test("users can vote on polls!", async () => {
+
+
 
     // Define votes for each user
     // Users can vote the same choice across multiple polls
@@ -106,16 +125,14 @@ describe("Voting", () => {
     };
 
     const expectedOutcomes = pollIds.map((pollId) => {
-      const aliceVote = alicePollsAndChoices.find((p) => p.pollId === pollId)!.choice;
-      const bobVote = bobPollsAndChoices.find((p) => p.pollId === pollId)!.choice;
-      const carolVote = carolPollsAndChoices.find((p) => p.pollId === pollId)!.choice;
+      const aliceVote = alicePollsAndChoices.find((alicePollAndChoice) => alicePollAndChoice.pollId === pollId)!.choice;
+      const bobVote = bobPollsAndChoices.find((bobPollAndChoice) => bobPollAndChoice.pollId === pollId)!.choice;
+      const carolVote = carolPollsAndChoices.find((carolPollAndChoice) => carolPollAndChoice.pollId === pollId)!.choice;
       return {
         pollId,
         expectedOutcome: calculateExpectedOutcome(aliceVote, bobVote, carolVote),
       };
     });
-
-    const owner = await getKeypairFromFile(`${os.homedir()}/.config/solana/id.json`);
 
     // Create separate users: alice, bob, and carol
     const alice = Keypair.generate();
@@ -124,40 +141,11 @@ describe("Voting", () => {
 
     // Create encryption keys for each user
     const aliceKeys = await makeClientSideKeys(provider as anchor.AnchorProvider, program.programId);
+    // console.log("MXE x25519 pubkey for alice is", aliceKeys.publicKey);
     const bobKeys = await makeClientSideKeys(provider as anchor.AnchorProvider, program.programId);
+    // console.log("MXE x25519 pubkey for bob is", bobKeys.publicKey);
     const carolKeys = await makeClientSideKeys(provider as anchor.AnchorProvider, program.programId);
-
-    console.log("Initializing vote stats computation definition");
-    const initVoteStatsSignature = await initVoteStatsCompDef(
-      program,
-      owner,
-      false,
-      false
-    );
-    console.log(
-      "Vote stats computation definition initialized with signature",
-      initVoteStatsSignature
-    );
-
-    console.log("Initializing voting computation definition");
-    const initVoteSignature = await initVoteCompDef(program, owner, false, false);
-    console.log(
-      "Vote computation definition initialized with signature",
-      initVoteSignature
-    );
-
-    console.log("Initializing reveal result computation definition");
-    const initRevealResultSignature = await initRevealResultCompDef(
-      program,
-      owner,
-      false,
-      false
-    );
-    console.log(
-      "Reveal result computation definition initialized with signature",
-      initRevealResultSignature
-    );
-
+    // console.log("MXE x25519 pubkey for carol is", carolKeys.publicKey);
 
     // Create encryption ciphers for each user
     const aliceCipher = new RescueCipher(aliceKeys.sharedSecret);
@@ -302,7 +290,7 @@ describe("Voting", () => {
           ),
         })
         .rpc({ skipPreflight: true, commitment: "confirmed" });
-      console.log(`Reveal queue for poll ${pollId} signature is `, revealQueueSignature);
+      // console.log(`Reveal queue for poll ${pollId} signature is `, revealQueueSignature);
 
       const revealFinalizeSignature = await awaitComputationFinalization(
         provider as anchor.AnchorProvider,
@@ -310,14 +298,14 @@ describe("Voting", () => {
         program.programId,
         "confirmed"
       );
-      console.log(
-        `Reveal finalize for poll ${pollId} signature is `,
-        revealFinalizeSignature
-      );
+      // console.log(
+      //   `Reveal finalize for poll ${pollId} signature is `,
+      //   revealFinalizeSignature
+      // );
 
       const revealEvent = await revealEventPromise;
       console.log(
-        `🏆 Decrypted winner for poll ${pollId} is ${getOptionName(revealEvent.output)} (${revealEvent.output})`
+        `🏆 Decrypted winner for poll ${pollId} is "${getOptionName(revealEvent.output)}"`
       );
       assert.equal(revealEvent.output, expectedOutcome);
     }
