@@ -1,6 +1,6 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { PublicKey } from "@solana/web3.js";
+import { Keypair, PublicKey } from "@solana/web3.js";
 import { Voting } from "../target/types/voting";
 import { randomBytes } from "crypto";
 import {
@@ -59,15 +59,73 @@ describe("Voting", () => {
     const OPTION_NAMES: Array<string> = ["Neo robot", "Humane AI PIN", "friend.com"];
     const getOptionName = (index: number): string => OPTION_NAMES[index] ?? `Option ${index}`;
 
-    const pollsAndChoices = [
+    // Define poll IDs
+    const pollIds = [420, 421, 422];
+
+    // Define votes for each user
+    // Users can vote the same choice across multiple polls
+    // Poll 420: Alice votes NeoRobot, Bob votes NeoRobot, Carol votes HumaneAIPIN
+    //   Expected: NeoRobot wins (2 votes)
+    // Poll 421: Alice votes HumaneAIPIN, Bob votes FriendCom, Carol votes HumaneAIPIN
+    //   Expected: HumaneAIPIN wins (2 votes)
+    // Poll 422: Alice votes NeoRobot, Bob votes NeoRobot, Carol votes FriendCom
+    //   Expected: NeoRobot wins (2 votes)
+    const alicePollsAndChoices = [
       { pollId: 420, choice: VoteOption.NeoRobot },
       { pollId: 421, choice: VoteOption.HumaneAIPIN },
+      { pollId: 422, choice: VoteOption.NeoRobot }, // Alice votes NeoRobot for both polls 420 and 422
+    ];
+
+    const bobPollsAndChoices = [
+      { pollId: 420, choice: VoteOption.NeoRobot },
+      { pollId: 421, choice: VoteOption.FriendCom },
+      { pollId: 422, choice: VoteOption.NeoRobot }, // Bob votes NeoRobot for both polls 420 and 422
+    ];
+
+    const carolPollsAndChoices = [
+      { pollId: 420, choice: VoteOption.HumaneAIPIN },
+      { pollId: 421, choice: VoteOption.HumaneAIPIN }, // Carol votes HumaneAIPIN for both polls 420 and 421
       { pollId: 422, choice: VoteOption.FriendCom },
     ];
 
+    // Calculate expected outcomes based on majority vote from alice, bob, and carol
+    const calculateExpectedOutcome = (
+      aliceChoice: number,
+      bobChoice: number,
+      carolChoice: number
+    ): number => {
+      const votes = [aliceChoice, bobChoice, carolChoice];
+      const counts: Array<number> = [0, 0, 0];
+      votes.forEach((vote) => {
+        counts[vote]++;
+      });
+      // Return the index with the highest count
+      // TODO: Handle tie votes - currently returns the first option with max votes in case of ties
+      const maxCount = Math.max(...counts);
+      return counts.indexOf(maxCount);
+    };
+
+    const expectedOutcomes = pollIds.map((pollId) => {
+      const aliceVote = alicePollsAndChoices.find((p) => p.pollId === pollId)!.choice;
+      const bobVote = bobPollsAndChoices.find((p) => p.pollId === pollId)!.choice;
+      const carolVote = carolPollsAndChoices.find((p) => p.pollId === pollId)!.choice;
+      return {
+        pollId,
+        expectedOutcome: calculateExpectedOutcome(aliceVote, bobVote, carolVote),
+      };
+    });
+
     const owner = await getKeypairFromFile(`${os.homedir()}/.config/solana/id.json`);
 
-    const { privateKey, publicKey, sharedSecret } = await makeClientSideKeys(provider as anchor.AnchorProvider, program.programId);
+    // Create separate users: alice, bob, and carol
+    const alice = Keypair.generate();
+    const bob = Keypair.generate();
+    const carol = Keypair.generate();
+
+    // Create encryption keys for each user
+    const aliceKeys = await makeClientSideKeys(provider as anchor.AnchorProvider, program.programId);
+    const bobKeys = await makeClientSideKeys(provider as anchor.AnchorProvider, program.programId);
+    const carolKeys = await makeClientSideKeys(provider as anchor.AnchorProvider, program.programId);
 
     console.log("Initializing vote stats computation definition");
     const initVoteStatsSignature = await initVoteStatsCompDef(
@@ -101,10 +159,13 @@ describe("Voting", () => {
     );
 
 
-    const cipher = new RescueCipher(sharedSecret);
+    // Create encryption ciphers for each user
+    const aliceCipher = new RescueCipher(aliceKeys.sharedSecret);
+    const bobCipher = new RescueCipher(bobKeys.sharedSecret);
+    const carolCipher = new RescueCipher(carolKeys.sharedSecret);
 
-    // Create multiple polls
-    for (const { pollId } of pollsAndChoices) {
+    // Create multiple polls (owner creates them)
+    for (const pollId of pollIds) {
       const pollNonce = randomBytes(16);
 
       const pollComputationOffset = getRandomBigNumber();
@@ -143,18 +204,22 @@ describe("Voting", () => {
       console.log(`Finalize poll ${pollId} signature is `, finalizePollSignature);
     }
 
-    // Cast votes for each poll for different outcomes
-    for (const { pollId, choice } of pollsAndChoices) {
+    // Helper function to cast a vote
+    const castVote = async (
+      voter: Keypair,
+      voterName: string,
+      pollId: number,
+      choice: number,
+      cipher: RescueCipher,
+      encryptionPublicKey: Uint8Array
+    ) => {
       const plaintext = [BigInt(choice)];
-
       const nonce = randomBytes(16);
       const ciphertext = cipher.encrypt(plaintext, nonce);
 
-      console.log(`Voting for poll ${pollId}: ${getOptionName(choice)}`);
+      console.log(`${voterName} voting for poll ${pollId}: ${getOptionName(choice)}`);
 
       const voteComputationOffset = getRandomBigNumber();
-
-      // Needs to be awaited before queueing the vote
       const voteEventPromise = awaitEvent("voteEvent");
 
       const queueVoteSignature = await program.methods
@@ -162,7 +227,7 @@ describe("Voting", () => {
           voteComputationOffset,
           pollId,
           Array.from(ciphertext[0]),
-          Array.from(publicKey),
+          Array.from(encryptionPublicKey),
           new anchor.BN(deserializeLE(nonce).toString())
         )
         .accountsPartial({
@@ -181,7 +246,7 @@ describe("Voting", () => {
           authority: owner.publicKey,
         })
         .rpc({ skipPreflight: true, commitment: "confirmed" });
-      console.log(`Queue vote for poll ${pollId} signature is `, queueVoteSignature);
+      console.log(`${voterName} queue vote for poll ${pollId} signature is `, queueVoteSignature);
 
       const finalizeVoteSignature = await awaitComputationFinalization(
         provider as anchor.AnchorProvider,
@@ -189,17 +254,32 @@ describe("Voting", () => {
         program.programId,
         "confirmed"
       );
-      console.log(`Finalize vote for poll ${pollId} signature is `, finalizeVoteSignature);
+      console.log(`${voterName} finalize vote for poll ${pollId} signature is `, finalizeVoteSignature);
 
       const voteEvent = await voteEventPromise;
       console.log(
-        `🗳️ Voted ${getOptionName(choice)} (${choice}) for poll ${pollId} at timestamp `,
+        `🗳️ ${voterName} voted ${getOptionName(choice)} (${choice}) for poll ${pollId} at timestamp `,
         voteEvent.timestamp.toString()
       );
+    };
+
+    // Alice votes first
+    for (const { pollId, choice } of alicePollsAndChoices) {
+      await castVote(alice, "Alice", pollId, choice, aliceCipher, aliceKeys.publicKey);
     }
 
-    // Reveal results for each poll
-    for (const { pollId, choice: expectedOutcome } of pollsAndChoices) {
+    // Bob votes second
+    for (const { pollId, choice } of bobPollsAndChoices) {
+      await castVote(bob, "Bob", pollId, choice, bobCipher, bobKeys.publicKey);
+    }
+
+    // Carol votes third
+    for (const { pollId, choice } of carolPollsAndChoices) {
+      await castVote(carol, "Carol", pollId, choice, carolCipher, carolKeys.publicKey);
+    }
+
+    // Reveal results for each poll and verify against expected outcomes
+    for (const { pollId, expectedOutcome } of expectedOutcomes) {
 
       const revealEventPromise = awaitEvent("revealResultEvent");
 
