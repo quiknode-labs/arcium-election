@@ -78,17 +78,24 @@ mod circuits {
     #[instruction]
     pub fn reveal_result(vote_stats_ctxt: Enc<Mxe, VoteStats>) -> u8 {
         let vote_stats = vote_stats_ctxt.to_arcis();
-        
+
         // Reveal all vote counts first (must be unconditional)
         let neo_count = vote_stats.neo_robot.reveal();
         let humane_count = vote_stats.humane_ai_pin.reveal();
         let friend_count = vote_stats.friend_com.reveal();
-        
-        // Find the maximum value and return its index
-        // Compare all three and return the winner (0, 1, or 2)
-        if neo_count >= humane_count && neo_count >= friend_count {
+
+        // Find the maximum count using chained .max() calls.
+        // Note: Arcis only supports `use arcis_imports::*`, so std imports like
+        // `use std::cmp;` are not available. Chaining .max() is the idiomatic
+        // Rust approach for finding the max of 3+ values when std::cmp::max
+        // or iterator methods are unavailable.
+        let max_count = neo_count.max(humane_count).max(friend_count);
+
+        // Return the index of the maximum (first match in case of ties)
+        // Note: Can't use early returns in Arcis, so we use if-else-if chain as an expression
+        if neo_count == max_count {
             0u8
-        } else if humane_count >= friend_count {
+        } else if humane_count == max_count {
             1u8
         } else {
             2u8
