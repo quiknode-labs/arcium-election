@@ -19,15 +19,17 @@
 #  'Program 11111111111111111111111111111111 invoke [3]'
 #  'Allocate: account Address { address: FLpEeHKkzCKwVvC7LMV3GBSLAsmhWSvEx2z4PYKWZk6U, base: None } already in use'
 
-# Kill any running validator process
-pkill -KILL solana-test-validator 
+# Kill any running validator process and wait for it to terminate
+if pgrep -f "solana-test-validator" > /dev/null; then
+  # Send TERM signal and wait for process to terminate
+  # On macOS, killall -w waits for the process to terminate. 
+  # On Linux (psmisc), -w doesn't exist - sorry to both Linux users.
+  killall -TERM -w solana-test-validator 2>/dev/null || true
+fi
 
 # Remove the test ledger directory to clear all persisted on-chain accounts
 # This includes computation definitions, polls, and any other accounts from previous test runs
 rm -rf .anchor/test-ledger
-
-# Brief pause to ensure the validator process has fully terminated
-sleep 2
 
 # Run the tests with a fresh ledger
 arcium test
