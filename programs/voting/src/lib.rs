@@ -102,6 +102,12 @@ pub mod voting {
     /// * `vote` - Encrypted vote (0, 1, or 2 for the three options)
     /// * `vote_encryption_pubkey` - Voter's public key for encryption
     /// * `vote_nonce` - Cryptographic nonce for the vote encryption
+    ///
+    /// Note: The `unused_variables` warning for `poll_id` is spurious. The parameter is actually used
+    /// in the `Vote` struct's `#[account]` constraint on line 391 via `poll_id.to_le_bytes()` for PDA
+    /// derivation. However, Rust's compiler cannot detect this usage because Anchor's macros expand
+    /// after the static analysis phase, so it appears unused in the function body.
+    #[allow(unused_variables)]
     pub fn vote(
         ctx: Context<Vote>,
         computation_offset: u64,
