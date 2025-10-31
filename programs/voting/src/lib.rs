@@ -98,6 +98,7 @@ pub mod voting {
     /// that individual votes remain confidential while updating the overall count.
     ///
     /// # Arguments
+    /// * `poll_id` - The poll ID (used for account derivation via Anchor's #[instruction] attribute)
     /// * `vote` - Encrypted vote (0, 1, or 2 for the three options)
     /// * `vote_encryption_pubkey` - Voter's public key for encryption
     /// * `vote_nonce` - Cryptographic nonce for the vote encryption
@@ -211,12 +212,12 @@ pub mod voting {
         ctx: Context<RevealResultCallback>,
         output: ComputationOutputs<RevealResultOutput>,
     ) -> Result<()> {
-        let o = match output {
+        let winner = match output {
             ComputationOutputs::Success(RevealResultOutput { field_0 }) => field_0,
             _ => return Err(ErrorCode::AbortedComputation.into()),
         };
 
-        emit!(RevealResultEvent { output: o });
+        emit!(RevealResultEvent { output: winner });
 
         Ok(())
     }
@@ -325,7 +326,7 @@ pub struct InitVoteStatsCompDef<'info> {
 
 #[queue_computation_accounts("vote", payer)]
 #[derive(Accounts)]
-#[instruction(computation_offset: u64, _id: u32)]
+#[instruction(computation_offset: u64, poll_id: u32)]
 pub struct Vote<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -386,7 +387,7 @@ pub struct Vote<'info> {
     )]
     pub authority: UncheckedAccount<'info>,
     #[account(
-        seeds = [b"poll", authority.key().as_ref(), _id.to_le_bytes().as_ref()],
+        seeds = [b"poll", authority.key().as_ref(), poll_id.to_le_bytes().as_ref()],
         bump = poll_acc.bump,
         has_one = authority
     )]

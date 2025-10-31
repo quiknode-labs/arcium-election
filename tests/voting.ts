@@ -61,7 +61,7 @@ describe("Voting", () => {
     const { privateKey, publicKey, sharedSecret } = await makeClientSideKeys(provider as anchor.AnchorProvider, program.programId);
 
     console.log("Initializing vote stats computation definition");
-    const initVoteStatsSig = await initVoteStatsCompDef(
+    const initVoteStatsSignature = await initVoteStatsCompDef(
       program,
       owner,
       false,
@@ -69,18 +69,18 @@ describe("Voting", () => {
     );
     console.log(
       "Vote stats computation definition initialized with signature",
-      initVoteStatsSig
+      initVoteStatsSignature
     );
 
     console.log("Initializing voting computation definition");
-    const initVoteSig = await initVoteCompDef(program, owner, false, false);
+    const initVoteSignature = await initVoteCompDef(program, owner, false, false);
     console.log(
       "Vote computation definition initialized with signature",
-      initVoteSig
+      initVoteSignature
     );
 
     console.log("Initializing reveal result computation definition");
-    const initRRSig = await initRevealResultCompDef(
+    const initRevealResultSignature = await initRevealResultCompDef(
       program,
       owner,
       false,
@@ -88,23 +88,23 @@ describe("Voting", () => {
     );
     console.log(
       "Reveal result computation definition initialized with signature",
-      initRRSig
+      initRevealResultSignature
     );
 
 
     const cipher = new RescueCipher(sharedSecret);
 
     // Create multiple polls
-    for (const { id: POLL_ID } of pollsAndChoices) {
+    for (const { id: pollId } of pollsAndChoices) {
       const pollNonce = randomBytes(16);
 
       const pollComputationOffset = getRandomBigNumber();
 
-      const pollSig = await program.methods
+      const createPollSignature = await program.methods
         .createNewPoll(
           pollComputationOffset,
-          POLL_ID,
-          `Poll ${POLL_ID}: $SOL to 500?`,
+          pollId,
+          `Poll ${pollId}: $SOL to 500?`,
           new anchor.BN(deserializeLE(pollNonce).toString())
         )
         .accountsPartial({
@@ -123,37 +123,37 @@ describe("Voting", () => {
         })
         .rpc({ skipPreflight: true, commitment: "confirmed" });
 
-      console.log(`🆕 Poll ${POLL_ID} created with signature`, pollSig);
+      console.log(`🆕 Poll ${pollId} created with signature`, createPollSignature);
 
-      const finalizePollSig = await awaitComputationFinalization(
+      const finalizePollSignature = await awaitComputationFinalization(
         provider as anchor.AnchorProvider,
         pollComputationOffset,
         program.programId,
         "confirmed"
       );
-      console.log(`Finalize poll ${POLL_ID} signature is `, finalizePollSig);
+      console.log(`Finalize poll ${pollId} signature is `, finalizePollSignature);
     }
 
     // Cast votes for each poll for different outcomes
     const optionNames = ["Neo robot", "Humane AI PIN", "friend.com"];
 
-    for (const { id: POLL_ID, choice } of pollsAndChoices) {
+    for (const { id: pollId, choice } of pollsAndChoices) {
       const plaintext = [BigInt(choice)];
 
       const nonce = randomBytes(16);
       const ciphertext = cipher.encrypt(plaintext, nonce);
 
-      console.log(`Voting for poll ${POLL_ID}: ${optionNames[choice]}`);
+      console.log(`Voting for poll ${pollId}: ${optionNames[choice]}`);
 
       const voteComputationOffset = getRandomBigNumber();
 
       // Needs to be awaited before queueing the vote
       const voteEventPromise = awaitEvent("voteEvent");
 
-      const queueVoteSig = await program.methods
+      const queueVoteSignature = await program.methods
         .vote(
           voteComputationOffset,
-          POLL_ID,
+          pollId,
           Array.from(ciphertext[0]),
           Array.from(publicKey),
           new anchor.BN(deserializeLE(nonce).toString())
@@ -174,32 +174,32 @@ describe("Voting", () => {
           authority: owner.publicKey,
         })
         .rpc({ skipPreflight: true, commitment: "confirmed" });
-      console.log(`Queue vote for poll ${POLL_ID} signature is `, queueVoteSig);
+      console.log(`Queue vote for poll ${pollId} signature is `, queueVoteSignature);
 
-      const finalizeSig = await awaitComputationFinalization(
+      const finalizeVoteSignature = await awaitComputationFinalization(
         provider as anchor.AnchorProvider,
         voteComputationOffset,
         program.programId,
         "confirmed"
       );
-      console.log(`Finalize vote for poll ${POLL_ID} signature is `, finalizeSig);
+      console.log(`Finalize vote for poll ${pollId} signature is `, finalizeVoteSignature);
 
       const voteEvent = await voteEventPromise;
       console.log(
-        `🗳️ Voted ${optionNames[choice]} (${choice}) for poll ${POLL_ID} at timestamp `,
+        `🗳️ Voted ${optionNames[choice]} (${choice}) for poll ${pollId} at timestamp `,
         voteEvent.timestamp.toString()
       );
     }
 
     // Reveal results for each poll
-    for (const { id: POLL_ID, choice: expectedOutcome } of pollsAndChoices) {
+    for (const { id: pollId, choice: expectedOutcome } of pollsAndChoices) {
 
       const revealEventPromise = awaitEvent("revealResultEvent");
 
       const revealComputationOffset = getRandomBigNumber();
 
       const revealQueueSignature = await program.methods
-        .revealResult(revealComputationOffset, POLL_ID)
+        .revealResult(revealComputationOffset, pollId)
         .accountsPartial({
           computationAccount: getComputationAccAddress(
             program.programId,
@@ -215,22 +215,22 @@ describe("Voting", () => {
           ),
         })
         .rpc({ skipPreflight: true, commitment: "confirmed" });
-      console.log(`Reveal queue for poll ${POLL_ID} signature is `, revealQueueSignature);
+      console.log(`Reveal queue for poll ${pollId} signature is `, revealQueueSignature);
 
-      const revealFinalizeSig = await awaitComputationFinalization(
+      const revealFinalizeSignature = await awaitComputationFinalization(
         provider as anchor.AnchorProvider,
         revealComputationOffset,
         program.programId,
         "confirmed"
       );
       console.log(
-        `Reveal finalize for poll ${POLL_ID} signature is `,
-        revealFinalizeSig
+        `Reveal finalize for poll ${pollId} signature is `,
+        revealFinalizeSignature
       );
 
       const revealEvent = await revealEventPromise;
       console.log(
-        `🏆 Decrypted winner for poll ${POLL_ID} is ${optionNames[revealEvent.output]} (${revealEvent.output})`
+        `🏆 Decrypted winner for poll ${pollId} is ${optionNames[revealEvent.output]} (${revealEvent.output})`
       );
       assert.equal(revealEvent.output, expectedOutcome);
     }
@@ -260,7 +260,7 @@ describe("Voting", () => {
       compDefPDA.toBase58()
     );
 
-    const sig = await program.methods
+    const transactionSignature = await program.methods
       .initVoteStatsCompDef()
       .accounts({
         compDefAccount: compDefPDA,
@@ -272,7 +272,7 @@ describe("Voting", () => {
         commitment: "confirmed",
         preflightCommitment: "confirmed",
       });
-    console.log("Init vote stats computation definition transaction", sig);
+    console.log("Init vote stats computation definition transaction", transactionSignature);
 
     if (uploadRawCircuit) {
       const rawCircuit = await fs.readFile("build/init_vote_stats.arcis");
@@ -299,7 +299,7 @@ describe("Voting", () => {
 
       await provider.sendAndConfirm(finalizeTx);
     }
-    return sig;
+    return transactionSignature;
   }
 
   async function initVoteCompDef(
@@ -320,7 +320,7 @@ describe("Voting", () => {
 
     console.log("Vote computation definition pda is ", compDefPDA.toBase58());
 
-    const sig = await program.methods
+    const transactionSignature = await program.methods
       .initVoteCompDef()
       .accounts({
         compDefAccount: compDefPDA,
@@ -332,7 +332,7 @@ describe("Voting", () => {
         commitment: "confirmed",
         preflightCommitment: "confirmed",
       });
-    console.log("Init vote computation definition transaction", sig);
+    console.log("Init vote computation definition transaction", transactionSignature);
 
     if (uploadRawCircuit) {
       const rawCircuit = await fs.readFile("build/vote.arcis");
@@ -359,7 +359,7 @@ describe("Voting", () => {
 
       await provider.sendAndConfirm(finalizeTx);
     }
-    return sig;
+    return transactionSignature;
   }
 
   async function initRevealResultCompDef(
@@ -383,7 +383,7 @@ describe("Voting", () => {
       compDefPDA.toBase58()
     );
 
-    const sig = await program.methods
+    const transactionSignature = await program.methods
       .initRevealResultCompDef()
       .accounts({
         compDefAccount: compDefPDA,
@@ -395,7 +395,7 @@ describe("Voting", () => {
         commitment: "confirmed",
         preflightCommitment: "confirmed",
       });
-    console.log("Init reveal result computation definition transaction", sig);
+    console.log("Init reveal result computation definition transaction", transactionSignature);
 
     if (uploadRawCircuit) {
       const rawCircuit = await fs.readFile("build/reveal_result.arcis");
@@ -422,7 +422,7 @@ describe("Voting", () => {
 
       await provider.sendAndConfirm(finalizeTx);
     }
-    return sig;
+    return transactionSignature;
   }
 });
 
