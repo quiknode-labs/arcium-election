@@ -234,9 +234,6 @@ describe("Voting", () => {
       );
       assert.equal(revealEvent.output, expectedOutcome);
     }
-    // Specify a slow test timeout of 30 seconds to show anything below 15 seconds as green.
-    // On my MBP this test takes 11 seconds
-    // See https://mochajs.org/#test-duration
   });
 
   async function initVoteStatsCompDef(
