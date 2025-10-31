@@ -34,13 +34,30 @@ export const getMXEPublicKeyWithRetry = async (
   );
 }
 
+/**
+ * Generates client-side encryption keys for Arcium confidential computing.
+ * 
+ * This helper exists because Arcium requires each user to establish a shared secret with the
+ * MXE (Multi-Party Execution Environment) before they can encrypt/decrypt confidential data.
+ * The process involves: (1) fetching the MXE's public key from the on-chain program,
+ * (2) generating a client-side x25519 key pair, and (3) computing a shared secret using
+ * Diffie-Hellman key exchange. The shared secret is then used with RescueCipher to encrypt
+ * votes before sending them to the program, ensuring votes remain confidential throughout
+ * the voting process.
+ * 
+ * This function centralizes this multi-step setup process and is reusable across multiple
+ * test users, avoiding code duplication and ensuring consistent key generation.
+ * 
+ * @param provider - The Anchor provider to interact with the Solana network
+ * @param programId - The program ID to fetch the MXE public key from
+ * @returns An object containing the private key, public key, and shared secret needed for encryption
+ */
 export const makeClientSideKeys = async (provider: anchor.AnchorProvider, programId: PublicKey) => {
 
   const mxePublicKey = await getMXEPublicKeyWithRetry(
     provider,
     programId
   );
-
 
   const privateKey = x25519.utils.randomSecretKey();
   const publicKey = x25519.getPublicKey(privateKey);
