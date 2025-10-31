@@ -49,11 +49,20 @@ describe("Voting", () => {
 
 
   it("users can vote on polls!", async () => {
-    // Vote options: 0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com
+    // Vote options enum: 0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com
+    enum VoteOption {
+      NeoRobot = 0,
+      HumaneAIPIN = 1,
+      FriendCom = 2,
+    }
+
+    const OPTION_NAMES: Array<string> = ["Neo robot", "Humane AI PIN", "friend.com"];
+    const getOptionName = (index: number): string => OPTION_NAMES[index] ?? `Option ${index}`;
+
     const pollsAndChoices = [
-      { pollId: 420, choice: 0 }, // Neo robot
-      { pollId: 421, choice: 1 }, // Humane AI PIN
-      { pollId: 422, choice: 2 }, // friend.com
+      { pollId: 420, choice: VoteOption.NeoRobot },
+      { pollId: 421, choice: VoteOption.HumaneAIPIN },
+      { pollId: 422, choice: VoteOption.FriendCom },
     ];
 
     const owner = await getKeypairFromFile(`${os.homedir()}/.config/solana/id.json`);
@@ -135,15 +144,13 @@ describe("Voting", () => {
     }
 
     // Cast votes for each poll for different outcomes
-    const optionNames = ["Neo robot", "Humane AI PIN", "friend.com"];
-
     for (const { pollId, choice } of pollsAndChoices) {
       const plaintext = [BigInt(choice)];
 
       const nonce = randomBytes(16);
       const ciphertext = cipher.encrypt(plaintext, nonce);
 
-      console.log(`Voting for poll ${pollId}: ${optionNames[choice]}`);
+      console.log(`Voting for poll ${pollId}: ${getOptionName(choice)}`);
 
       const voteComputationOffset = getRandomBigNumber();
 
@@ -186,7 +193,7 @@ describe("Voting", () => {
 
       const voteEvent = await voteEventPromise;
       console.log(
-        `🗳️ Voted ${optionNames[choice]} (${choice}) for poll ${pollId} at timestamp `,
+        `🗳️ Voted ${getOptionName(choice)} (${choice}) for poll ${pollId} at timestamp `,
         voteEvent.timestamp.toString()
       );
     }
@@ -230,7 +237,7 @@ describe("Voting", () => {
 
       const revealEvent = await revealEventPromise;
       console.log(
-        `🏆 Decrypted winner for poll ${pollId} is ${optionNames[revealEvent.output]} (${revealEvent.output})`
+        `🏆 Decrypted winner for poll ${pollId} is ${getOptionName(revealEvent.output)} (${revealEvent.output})`
       );
       assert.equal(revealEvent.output, expectedOutcome);
     }
