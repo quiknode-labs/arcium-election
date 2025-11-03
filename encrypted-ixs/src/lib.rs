@@ -39,18 +39,18 @@ mod circuits {
     /// and can only be revealed by the poll authority.
     ///
     /// # Arguments
-    /// * `vote_ctxt` - The encrypted vote to be counted (0, 1, or 2)
-    /// * `vote_stats_ctxt` - Current encrypted vote tallies
+    /// * `vote_ctx` - The encrypted vote to be counted (0, 1, or 2)
+    /// * `vote_stats_ctx` - Current encrypted vote tallies
     ///
     /// # Returns
     /// Updated encrypted vote statistics with the new vote included
     #[instruction]
     pub fn vote(
-        vote_ctxt: Enc<Shared, UserVote>,
-        vote_stats_ctxt: Enc<Mxe, VoteStats>,
+        vote_ctx: Enc<Shared, UserVote>,
+        vote_stats_ctx: Enc<Mxe, VoteStats>,
     ) -> Enc<Mxe, VoteStats> {
-        let user_vote = vote_ctxt.to_arcis();
-        let mut vote_stats = vote_stats_ctxt.to_arcis();
+        let user_vote = vote_ctx.to_arcis();
+        let mut vote_stats = vote_stats_ctx.to_arcis();
 
         // Increment appropriate counter based on vote value
         if user_vote.vote == 0 {
@@ -61,7 +61,7 @@ mod circuits {
             vote_stats.friend_com += 1;
         }
 
-        vote_stats_ctxt.owner.from_arcis(vote_stats)
+        vote_stats_ctx.owner.from_arcis(vote_stats)
     }
 
     /// Reveals the final result of the poll by comparing vote tallies.
@@ -70,14 +70,14 @@ mod circuits {
     /// Only the final result (winner) is revealed, not the actual vote counts.
     ///
     /// # Arguments
-    /// * `vote_stats_ctxt` - Encrypted vote tallies to be revealed
+    /// * `vote_stats_ctx` - Encrypted vote tallies to be revealed
     ///
     /// # Returns
     /// The winning option: 0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com
     /// In case of a tie, returns the option with the lower index that tied.
     #[instruction]
-    pub fn reveal_result(vote_stats_ctxt: Enc<Mxe, VoteStats>) -> u8 {
-        let vote_stats = vote_stats_ctxt.to_arcis();
+    pub fn reveal_result(vote_stats_ctx: Enc<Mxe, VoteStats>) -> u8 {
+        let vote_stats = vote_stats_ctx.to_arcis();
 
         // Reveal all vote counts first (must be unconditional)
         let neo_count = vote_stats.neo_robot.reveal();
