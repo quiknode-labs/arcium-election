@@ -65,7 +65,7 @@ describe("Election", () => {
 
     // Create multiple polls (owner creates them) before tests run.
     // Polls are on-chain accounts that persist, so they're created once and reused across tests.
-    // This setup phase creates all polls that will be used in the voting tests.
+    // This setup phase creates all polls that will be used in the election tests.
     for (const pollId of pollIds) {
       const pollNonce = randomBytes(16);
 
