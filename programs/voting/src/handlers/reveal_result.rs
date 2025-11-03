@@ -1,0 +1,64 @@
+use anchor_lang::prelude::*;
+use arcium_anchor::prelude::*;
+
+use crate::{InitRevealResultCompDef, RevealResultCallback, RevealResultOutput, RevealVotingResult};
+
+pub fn init_reveal_result_comp_def(ctx: Context<InitRevealResultCompDef>) -> Result<()> {
+    init_comp_def(ctx.accounts, true, 0, None, None)?;
+    Ok(())
+}
+
+/// Reveals the final result of the poll.
+///
+/// Only the poll authority can call this function to decrypt and reveal the vote tallies.
+/// The MPC computation compares all three vote counts and returns the winning option.
+///
+/// # Arguments
+/// * `id` - The poll ID to reveal results for
+pub fn reveal_result(
+    ctx: Context<RevealVotingResult>,
+    computation_offset: u64,
+    id: u32,
+) -> Result<()> {
+    require!(
+        ctx.accounts.payer.key() == ctx.accounts.poll_acc.authority,
+        crate::ErrorCode::InvalidAuthority
+    );
+
+    msg!("Revealing voting result for poll with id {}", id);
+
+    let computation_args = vec![
+        Argument::PlaintextU128(ctx.accounts.poll_acc.nonce),
+        Argument::Account(
+            ctx.accounts.poll_acc.key(),
+            // Offset calculation: 8 bytes (discriminator) + 1 byte (bump)
+            8 + 1,
+            32 * 3, // 3 encrypted vote counters (Neo robot, Humane AI PIN, friend.com), 32 bytes each
+        ),
+    ];
+
+    ctx.accounts.sign_pda_account.bump = ctx.bumps.sign_pda_account;
+
+    queue_computation(
+        ctx.accounts,
+        computation_offset,
+        computation_args,
+        None,
+        vec![RevealResultCallback::callback_ix(&[])],
+    )?;
+    Ok(())
+}
+
+pub fn reveal_result_callback(
+    _ctx: Context<RevealResultCallback>,
+    output: ComputationOutputs<RevealResultOutput>,
+) -> Result<()> {
+    let winner = match output {
+        ComputationOutputs::Success(RevealResultOutput { field_0 }) => field_0,
+        _ => return Err(crate::ErrorCode::AbortedComputation.into()),
+    };
+
+    emit!(crate::RevealResultEvent { output: winner });
+
+    Ok(())
+}
