@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-voting = "J7KTdhMTVhy7vtgyFSXi9SpptdTDmpg93pB53UdfuttF"
+election = "J7KTdhMTVhy7vtgyFSXi9SpptdTDmpg93pB53UdfuttF"
 
 [registry]
 url = "https://api.apr.dev"
@@ -16,4 +16,4 @@ cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
-test = "npx tsx tests/voting.ts"
+test = "npx tsx tests/election.ts"

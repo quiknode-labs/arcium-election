@@ -20,7 +20,7 @@ pub use state::Poll;
 declare_id!("J7KTdhMTVhy7vtgyFSXi9SpptdTDmpg93pB53UdfuttF");
 
 #[arcium_program]
-pub mod voting {
+pub mod election {
     use super::*;
 
     pub fn init_vote_stats_comp_def(ctx: Context<InitVoteStatsCompDef>) -> Result<()> {
@@ -437,7 +437,7 @@ pub mod voting {
     }
 }
 
-pub use voting::{
+pub use election::{
     CreatePoll,
     InitRevealResultCompDef,
     InitVoteCompDef,

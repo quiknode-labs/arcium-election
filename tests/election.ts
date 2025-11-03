@@ -1,7 +1,7 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { Keypair, PublicKey } from "@solana/web3.js";
-import { Voting } from "../target/types/voting";
+import { Election } from "../target/types/election";
 import { randomBytes } from "crypto";
 import {
   awaitComputationFinalization,
@@ -26,10 +26,10 @@ import { describe, test, before } from "node:test";
 import assert from "node:assert";
 import { getRandomBigNumber, makeClientSideKeys, awaitEvent } from "./helpers";
 
-describe("Voting", () => {
+describe("Election", () => {
   // Configure the client to use the local cluster.
   anchor.setProvider(anchor.AnchorProvider.env());
-  const program = anchor.workspace.Voting as Program<Voting>;
+  const program = anchor.workspace.Election as Program<Election>;
   const provider = anchor.getProvider();
 
   const arciumEnv = getArciumEnv();
@@ -324,7 +324,7 @@ describe("Voting", () => {
   });
 
   const initVoteStatsCompDef = async (
-    program: Program<Voting>,
+    program: Program<Election>,
     pollAuthority: anchor.web3.Keypair,
     uploadRawCircuit: boolean,
     offchainSource: boolean
@@ -387,7 +387,7 @@ describe("Voting", () => {
   }
 
   const initVoteCompDef = async (
-    program: Program<Voting>,
+    program: Program<Election>,
     pollAuthority: anchor.web3.Keypair,
     uploadRawCircuit: boolean,
     offchainSource: boolean
@@ -447,7 +447,7 @@ describe("Voting", () => {
   }
 
   const initRevealResultCompDef = async (
-    program: Program<Voting>,
+    program: Program<Election>,
     pollAuthority: anchor.web3.Keypair,
     uploadRawCircuit: boolean,
     offchainSource: boolean
