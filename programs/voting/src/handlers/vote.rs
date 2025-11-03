@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use arcium_anchor::prelude::*;
 use arcium_client::idl::arcium::types::CallbackAccount;
 
-use crate::{error::ErrorCode, state::VoteEvent, InitVoteCompDef, Vote, VoteCallback, VoteOutput};
+use crate::{error::ErrorCode, state::{Poll, VoteEvent}, InitVoteCompDef, Vote, VoteCallback, VoteOutput};
 
 pub fn init_vote_comp_def(ctx: Context<InitVoteCompDef>) -> Result<()> {
     init_comp_def(ctx.accounts, true, 0, None, None)?;
@@ -41,8 +41,8 @@ pub fn vote(
         Argument::PlaintextU128(ctx.accounts.poll_acc.nonce),
         Argument::Account(
             ctx.accounts.poll_acc.key(),
-            // Offset calculation: 8 bytes (discriminator) + 1 byte (bump)
-            8 + 1,
+            // Offset calculation: discriminator + 1 byte (bump)
+            (Poll::DISCRIMINATOR.len() + 1) as u32,
             32 * 3, // 3 vote counters (Neo robot, Humane AI PIN, friend.com), each stored as 32-byte ciphertext
         ),
     ];

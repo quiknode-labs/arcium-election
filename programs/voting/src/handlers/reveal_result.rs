@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use arcium_anchor::prelude::*;
 
-use crate::{error::ErrorCode, state::RevealResultEvent, InitRevealResultCompDef, RevealResultCallback, RevealResultOutput, RevealVotingResult};
+use crate::{error::ErrorCode, state::{Poll, RevealResultEvent}, InitRevealResultCompDef, RevealResultCallback, RevealResultOutput, RevealVotingResult};
 
 pub fn init_reveal_result_comp_def(ctx: Context<InitRevealResultCompDef>) -> Result<()> {
     init_comp_def(ctx.accounts, true, 0, None, None)?;
@@ -31,8 +31,8 @@ pub fn reveal_result(
         Argument::PlaintextU128(ctx.accounts.poll_acc.nonce),
         Argument::Account(
             ctx.accounts.poll_acc.key(),
-            // Offset calculation: 8 bytes (discriminator) + 1 byte (bump)
-            8 + 1,
+            // Offset calculation: discriminator + 1 byte (bump)
+            (Poll::DISCRIMINATOR.len() + 1) as u32,
             32 * 3, // 3 encrypted vote counters (Neo robot, Humane AI PIN, friend.com), 32 bytes each
         ),
     ];
