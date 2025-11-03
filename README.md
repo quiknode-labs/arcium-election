@@ -1,8 +1,6 @@
-# Standalone Arcium Voting Example
+# Standalone Arcium Election Example
 
-My intention here is to fix all the warnings and do a video based on the code once I can get it to work reliably.
-
-Blah
+Based on the https://github.com/arcium-hq/examples voting' app with a significnt number of fixes (see CHANGELOG), including fixes to race conditions, code cleanups, better tests, and more consistent naming.
 
 ## To Run
 
