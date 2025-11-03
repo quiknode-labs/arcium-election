@@ -15,7 +15,7 @@ pub mod state;
 
 use constants::*;
 pub use error::ErrorCode;
-use state::*;
+pub use state::Poll;
 
 declare_id!("J7KTdhMTVhy7vtgyFSXi9SpptdTDmpg93pB53UdfuttF");
 
@@ -130,7 +130,7 @@ pub mod voting {
 
         /// CHECK: poll_acc, checked by the callback account key passed in queue_computation
         #[account(mut)]
-        pub poll_acc: Account<'info, PollAccount>,
+        pub poll_acc: Account<'info, Poll>,
     }
 
     #[queue_computation_accounts("init_vote_stats", payer)]
@@ -193,11 +193,11 @@ pub mod voting {
         #[account(
             init,
             payer = payer,
-            space = 8 + PollAccount::INIT_SPACE,
+            space = 8 + Poll::INIT_SPACE,
             seeds = [b"poll", payer.key().as_ref(), id.to_le_bytes().as_ref()],
             bump,
         )]
-        pub poll_acc: Account<'info, PollAccount>,
+        pub poll_acc: Account<'info, Poll>,
     }
 
     #[init_computation_definition_accounts("vote", payer)]
@@ -302,7 +302,7 @@ pub mod voting {
             bump = poll_acc.bump,
             has_one = authority
         )]
-        pub poll_acc: Account<'info, PollAccount>,
+        pub poll_acc: Account<'info, Poll>,
     }
 
     #[callback_accounts("vote")]
@@ -320,7 +320,7 @@ pub mod voting {
         pub instructions_sysvar: AccountInfo<'info>,
 
         #[account(mut)]
-        pub poll_acc: Account<'info, PollAccount>,
+        pub poll_acc: Account<'info, Poll>,
     }
 
     #[init_computation_definition_accounts("reveal_result", payer)]
@@ -418,7 +418,7 @@ pub mod voting {
             seeds = [b"poll", payer.key().as_ref(), id.to_le_bytes().as_ref()],
             bump = poll_acc.bump
         )]
-        pub poll_acc: Account<'info, PollAccount>,
+        pub poll_acc: Account<'info, Poll>,
     }
 
     #[callback_accounts("reveal_result")]

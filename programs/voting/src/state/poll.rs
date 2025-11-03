@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 /// Represents a confidential poll with encrypted vote tallies.
 #[account]
 #[derive(InitSpace)]
-pub struct PollAccount {
+pub struct Poll {
     /// PDA bump seed
     pub bump: u8,
     /// Encrypted vote counters: [neo_robot_count, humane_ai_pin_count, friend_com_count] as 32-byte ciphertexts
