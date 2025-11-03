@@ -29,7 +29,7 @@ pub fn create_poll(
     ctx.accounts.poll_acc.id = id;
     ctx.accounts.poll_acc.authority = ctx.accounts.payer.key();
     ctx.accounts.poll_acc.nonce = nonce;
-    ctx.accounts.poll_acc.vote_state = [[0; 32]; 3];
+    ctx.accounts.poll_acc.vote_counts = [[0; 32]; 3];
 
     let computation_args = vec![Argument::PlaintextU128(nonce)];
 

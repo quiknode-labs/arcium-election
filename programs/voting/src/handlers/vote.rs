@@ -71,7 +71,7 @@ pub fn vote_callback(
         _ => return Err(ErrorCode::AbortedComputation.into()),
     };
 
-    ctx.accounts.poll_acc.vote_state = vote_result.ciphertexts;
+    ctx.accounts.poll_acc.vote_counts = vote_result.ciphertexts;
     ctx.accounts.poll_acc.nonce = vote_result.nonce;
 
     let clock = Clock::get()?;

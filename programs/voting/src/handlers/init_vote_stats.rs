@@ -17,7 +17,7 @@ pub fn init_vote_stats_callback(
         _ => return Err(ErrorCode::AbortedComputation.into()),
     };
 
-    ctx.accounts.poll_acc.vote_state = computation_result.ciphertexts;
+    ctx.accounts.poll_acc.vote_counts = computation_result.ciphertexts;
     ctx.accounts.poll_acc.nonce = computation_result.nonce;
 
     Ok(())

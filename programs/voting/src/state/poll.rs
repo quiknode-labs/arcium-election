@@ -7,7 +7,7 @@ pub struct Poll {
     /// PDA bump seed
     pub bump: u8,
     /// Encrypted vote counters: [neo_robot_count, humane_ai_pin_count, friend_com_count] as 32-byte ciphertexts
-    pub vote_state: [[u8; 32]; 3],
+    pub vote_counts: [[u8; 32]; 3],
     /// Unique identifier for this poll
     pub id: u32,
     /// Public key of the poll creator (only they can reveal results)
