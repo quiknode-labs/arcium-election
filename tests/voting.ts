@@ -75,7 +75,7 @@ describe("Voting", () => {
         .createPoll(
           pollComputationOffset,
           pollId,
-          `Poll ${pollId}: $SOL to 500?`,
+          `Worst tech invention of 2025?`,
           new anchor.BN(deserializeLE(pollNonce).toString())
         )
         .accountsPartial({
