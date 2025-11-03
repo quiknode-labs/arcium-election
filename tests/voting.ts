@@ -48,20 +48,20 @@ describe("Voting", () => {
 
   const getOptionName = (index: number): string => OPTION_NAMES[index] ?? `Option ${index}`;
 
-  // Owner keypair for creating polls and initializing computation definitions
-  let owner: anchor.web3.Keypair;
+  // Poll authority keypair for creating polls and initializing computation definitions
+  let pollAuthority: anchor.web3.Keypair;
 
   before(async () => {
-    owner = await getKeypairFromFile(`${os.homedir()}/.config/solana/id.json`);
+    pollAuthority = await getKeypairFromFile(`${os.homedir()}/.config/solana/id.json`);
 
     // Computation definitions are persistent on-chain PDAs that register encrypted instructions
     // (like "vote", "init_vote_stats", "reveal_result"). They must be initialized ONCE per
     // deployment/test session. Re-initializing them in the same session would cause "account
     // already in use" errors since the accounts already exist on-chain. This setup is separate
     // from test logic and only needs to happen once before running any tests.
-    await initVoteStatsCompDef(program, owner, false, false);
-    await initVoteCompDef(program, owner, false, false);
-    await initRevealResultCompDef(program, owner, false, false);
+    await initVoteStatsCompDef(program, pollAuthority, false, false);
+    await initVoteCompDef(program, pollAuthority, false, false);
+    await initRevealResultCompDef(program, pollAuthority, false, false);
 
     // Create multiple polls (owner creates them) before tests run.
     // Polls are on-chain accounts that persist, so they're created once and reused across tests.
@@ -221,7 +221,7 @@ describe("Voting", () => {
             program.programId,
             Buffer.from(getCompDefAccOffset("vote")).readUInt32LE()
           ),
-          authority: owner.publicKey,
+          authority: pollAuthority.publicKey,
         })
         .rpc({ skipPreflight: true, commitment: "confirmed" });
       console.log(`${voterName} queue vote for poll ${pollId} signature is `, queueVoteSignature);
@@ -303,7 +303,7 @@ describe("Voting", () => {
 
   const initVoteStatsCompDef = async (
     program: Program<Voting>,
-    owner: anchor.web3.Keypair,
+    pollAuthority: anchor.web3.Keypair,
     uploadRawCircuit: boolean,
     offchainSource: boolean
   ): Promise<string> => {
@@ -326,10 +326,10 @@ describe("Voting", () => {
       .initVoteStatsCompDef()
       .accounts({
         compDefAccount: compDefPDA,
-        payer: owner.publicKey,
+        payer: pollAuthority.publicKey,
         mxeAccount: getMXEAccAddress(program.programId),
       })
-      .signers([owner])
+      .signers([pollAuthority])
       .rpc({
         commitment: "confirmed",
         preflightCommitment: "confirmed",
@@ -357,7 +357,7 @@ describe("Voting", () => {
       finalizeTx.recentBlockhash = latestBlockhash.blockhash;
       finalizeTx.lastValidBlockHeight = latestBlockhash.lastValidBlockHeight;
 
-      finalizeTx.sign(owner);
+      finalizeTx.sign(pollAuthority);
 
       await provider.sendAndConfirm(finalizeTx);
     }
@@ -366,7 +366,7 @@ describe("Voting", () => {
 
   const initVoteCompDef = async (
     program: Program<Voting>,
-    owner: anchor.web3.Keypair,
+    pollAuthority: anchor.web3.Keypair,
     uploadRawCircuit: boolean,
     offchainSource: boolean
   ): Promise<string> => {
@@ -386,10 +386,10 @@ describe("Voting", () => {
       .initVoteCompDef()
       .accounts({
         compDefAccount: compDefPDA,
-        payer: owner.publicKey,
+        payer: pollAuthority.publicKey,
         mxeAccount: getMXEAccAddress(program.programId),
       })
-      .signers([owner])
+      .signers([pollAuthority])
       .rpc({
         commitment: "confirmed",
         preflightCommitment: "confirmed",
@@ -417,7 +417,7 @@ describe("Voting", () => {
       finalizeTx.recentBlockhash = latestBlockhash.blockhash;
       finalizeTx.lastValidBlockHeight = latestBlockhash.lastValidBlockHeight;
 
-      finalizeTx.sign(owner);
+      finalizeTx.sign(pollAuthority);
 
       await provider.sendAndConfirm(finalizeTx);
     }
@@ -426,7 +426,7 @@ describe("Voting", () => {
 
   const initRevealResultCompDef = async (
     program: Program<Voting>,
-    owner: anchor.web3.Keypair,
+    pollAuthority: anchor.web3.Keypair,
     uploadRawCircuit: boolean,
     offchainSource: boolean
   ): Promise<string> => {
@@ -449,10 +449,10 @@ describe("Voting", () => {
       .initRevealResultCompDef()
       .accounts({
         compDefAccount: compDefPDA,
-        payer: owner.publicKey,
+        payer: pollAuthority.publicKey,
         mxeAccount: getMXEAccAddress(program.programId),
       })
-      .signers([owner])
+      .signers([pollAuthority])
       .rpc({
         commitment: "confirmed",
         preflightCommitment: "confirmed",
@@ -480,7 +480,7 @@ describe("Voting", () => {
       finalizeTx.recentBlockhash = latestBlockhash.blockhash;
       finalizeTx.lastValidBlockHeight = latestBlockhash.lastValidBlockHeight;
 
-      finalizeTx.sign(owner);
+      finalizeTx.sign(pollAuthority);
 
       await provider.sendAndConfirm(finalizeTx);
     }
