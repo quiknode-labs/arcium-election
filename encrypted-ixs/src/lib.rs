@@ -7,9 +7,7 @@ mod circuits {
     /// Tracks the encrypted vote tallies for a poll.
     /// Three voting options: 0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com
     pub struct VoteStats {
-        neo_robot: u64,
-        humane_ai_pin: u64,
-        friend_com: u64,
+        counts: [u64; 3],
     }
 
     /// Represents a single encrypted vote.
@@ -24,11 +22,7 @@ mod circuits {
     /// The counters remain encrypted and can only be updated through MPC operations.
     #[instruction]
     pub fn init_vote_stats(mxe: Mxe) -> Enc<Mxe, VoteStats> {
-        let vote_stats = VoteStats {
-            neo_robot: 0,
-            humane_ai_pin: 0,
-            friend_com: 0,
-        };
+        let vote_stats = VoteStats { counts: [0, 0, 0] };
         mxe.from_arcis(vote_stats)
     }
 
@@ -53,12 +47,13 @@ mod circuits {
         let mut vote_stats = vote_stats_ctx.to_arcis();
 
         // Increment appropriate counter based on vote value
+        // Note: Must use explicit conditionals to avoid information leakage in encrypted circuits
         if user_vote.vote == 0 {
-            vote_stats.neo_robot += 1;
+            vote_stats.counts[0] += 1;
         } else if user_vote.vote == 1 {
-            vote_stats.humane_ai_pin += 1;
+            vote_stats.counts[1] += 1;
         } else {
-            vote_stats.friend_com += 1;
+            vote_stats.counts[2] += 1;
         }
 
         vote_stats_ctx.owner.from_arcis(vote_stats)
@@ -80,22 +75,22 @@ mod circuits {
         let vote_stats = vote_stats_ctx.to_arcis();
 
         // Reveal all vote counts first (must be unconditional)
-        let neo_count = vote_stats.neo_robot.reveal();
-        let humane_count = vote_stats.humane_ai_pin.reveal();
-        let friend_count = vote_stats.friend_com.reveal();
+        let count0 = vote_stats.counts[0].reveal();
+        let count1 = vote_stats.counts[1].reveal();
+        let count2 = vote_stats.counts[2].reveal();
 
         // Find the maximum count using chained .max() calls.
         // Note: Arcis only supports `use arcis_imports::*`, so std imports like
         // `use std::cmp;` are not available. Chaining .max() is the idiomatic
         // Rust approach for finding the max of 3+ values when std::cmp::max
         // or iterator methods are unavailable.
-        let max_count = neo_count.max(humane_count).max(friend_count);
+        let max_count = count0.max(count1).max(count2);
 
         // Return the index of the maximum (first match in case of ties)
         // Note: Can't use early returns in Arcis, so we use if-else-if chain as an expression
-        if neo_count == max_count {
+        if count0 == max_count {
             0u8
-        } else if humane_count == max_count {
+        } else if count1 == max_count {
             1u8
         } else {
             2u8
