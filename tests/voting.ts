@@ -21,7 +21,7 @@ import {
 } from "@arcium-hq/client";
 import * as fs from "fs/promises";
 import * as os from "os";
-import { getKeypairFromFile } from "@solana-developers/helpers"
+import { getKeypairFromFile, airdropIfRequired } from "@solana-developers/helpers"
 import { describe, test, before } from "node:test";
 import assert from "node:assert";
 import { getRandomBigNumber, makeClientSideKeys, awaitEvent } from "./helpers";
@@ -169,6 +169,26 @@ describe("Voting", () => {
     const bob = Keypair.generate();
     const carol = Keypair.generate();
 
+    // Fund voters with SOL for transaction fees (1 SOL each)
+    await airdropIfRequired(
+      provider.connection,
+      alice.publicKey,
+      1_000_000_000, // 1 SOL in lamports
+      500_000_000 // 0.5 SOL minimum balance threshold
+    );
+    await airdropIfRequired(
+      provider.connection,
+      bob.publicKey,
+      1_000_000_000,
+      500_000_000
+    );
+    await airdropIfRequired(
+      provider.connection,
+      carol.publicKey,
+      1_000_000_000,
+      500_000_000
+    );
+
     // Create encryption keys for each user
     const aliceKeys = await makeClientSideKeys(provider as anchor.AnchorProvider, program.programId);
     // console.log("MXE x25519 pubkey for alice is", aliceKeys.publicKey);
@@ -209,6 +229,7 @@ describe("Voting", () => {
           new anchor.BN(deserializeLE(nonce).toString())
         )
         .accountsPartial({
+          payer: voter.publicKey,
           computationAccount: getComputationAccAddress(
             program.programId,
             voteComputationOffset
@@ -223,6 +244,7 @@ describe("Voting", () => {
           ),
           authority: pollAuthority.publicKey,
         })
+        .signers([voter])
         .rpc({ skipPreflight: true, commitment: "confirmed" });
       console.log(`${voterName} queue vote for poll ${pollId} signature is `, queueVoteSignature);
 
