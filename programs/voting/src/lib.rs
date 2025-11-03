@@ -8,11 +8,16 @@
 use anchor_lang::prelude::*;
 use arcium_anchor::prelude::*;
 
-declare_id!("J7KTdhMTVhy7vtgyFSXi9SpptdTDmpg93pB53UdfuttF");
+pub mod constants;
+pub mod error;
+pub mod handlers;
+pub mod state;
 
-const COMP_DEF_OFFSET_INIT_VOTE_STATS: u32 = comp_def_offset("init_vote_stats");
-const COMP_DEF_OFFSET_VOTE: u32 = comp_def_offset("vote");
-const COMP_DEF_OFFSET_REVEAL: u32 = comp_def_offset("reveal_result");
+use constants::*;
+pub use error::ErrorCode;
+use state::*;
+
+declare_id!("J7KTdhMTVhy7vtgyFSXi9SpptdTDmpg93pB53UdfuttF");
 
 #[arcium_program]
 pub mod voting {
@@ -446,45 +451,3 @@ pub use voting::{
     VoteCallback,
     VoteOutput,
 };
-
-pub mod handlers;
-
-/// Represents a confidential poll with encrypted vote tallies.
-#[account]
-#[derive(InitSpace)]
-pub struct PollAccount {
-    /// PDA bump seed
-    pub bump: u8,
-    /// Encrypted vote counters: [neo_robot_count, humane_ai_pin_count, friend_com_count] as 32-byte ciphertexts
-    pub vote_state: [[u8; 32]; 3],
-    /// Unique identifier for this poll
-    pub id: u32,
-    /// Public key of the poll creator (only they can reveal results)
-    pub authority: Pubkey,
-    /// Cryptographic nonce for the encrypted vote counters
-    pub nonce: u128,
-    /// The poll question (max 50 characters)
-    #[max_len(50)]
-    pub question: String,
-}
-
-#[error_code]
-pub enum ErrorCode {
-    #[msg("Invalid authority")]
-    InvalidAuthority,
-    #[msg("The computation was aborted")]
-    AbortedComputation,
-    #[msg("Cluster not set")]
-    ClusterNotSet,
-}
-
-#[event]
-pub struct VoteEvent {
-    pub timestamp: i64,
-}
-
-#[event]
-pub struct RevealResultEvent {
-    /// The winning option: 0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com
-    pub output: u8,
-}

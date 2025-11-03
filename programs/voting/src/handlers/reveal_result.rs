@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use arcium_anchor::prelude::*;
 
-use crate::{InitRevealResultCompDef, RevealResultCallback, RevealResultOutput, RevealVotingResult};
+use crate::{error::ErrorCode, state::RevealResultEvent, InitRevealResultCompDef, RevealResultCallback, RevealResultOutput, RevealVotingResult};
 
 pub fn init_reveal_result_comp_def(ctx: Context<InitRevealResultCompDef>) -> Result<()> {
     init_comp_def(ctx.accounts, true, 0, None, None)?;
@@ -22,7 +22,7 @@ pub fn reveal_result(
 ) -> Result<()> {
     require!(
         ctx.accounts.payer.key() == ctx.accounts.poll_acc.authority,
-        crate::ErrorCode::InvalidAuthority
+        ErrorCode::InvalidAuthority
     );
 
     msg!("Revealing voting result for poll with id {}", id);
@@ -55,10 +55,10 @@ pub fn reveal_result_callback(
 ) -> Result<()> {
     let winner = match output {
         ComputationOutputs::Success(RevealResultOutput { field_0 }) => field_0,
-        _ => return Err(crate::ErrorCode::AbortedComputation.into()),
+        _ => return Err(ErrorCode::AbortedComputation.into()),
     };
 
-    emit!(crate::RevealResultEvent { output: winner });
+    emit!(RevealResultEvent { output: winner });
 
     Ok(())
 }

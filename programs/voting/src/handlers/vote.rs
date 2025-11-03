@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use arcium_anchor::prelude::*;
 use arcium_client::idl::arcium::types::CallbackAccount;
 
-use crate::{InitVoteCompDef, Vote, VoteCallback, VoteOutput};
+use crate::{error::ErrorCode, state::VoteEvent, InitVoteCompDef, Vote, VoteCallback, VoteOutput};
 
 pub fn init_vote_comp_def(ctx: Context<InitVoteCompDef>) -> Result<()> {
     init_comp_def(ctx.accounts, true, 0, None, None)?;
@@ -68,7 +68,7 @@ pub fn vote_callback(
 ) -> Result<()> {
     let vote_result = match output {
         ComputationOutputs::Success(VoteOutput { field_0 }) => field_0,
-        _ => return Err(crate::ErrorCode::AbortedComputation.into()),
+        _ => return Err(ErrorCode::AbortedComputation.into()),
     };
 
     ctx.accounts.poll_acc.vote_state = vote_result.ciphertexts;
@@ -77,7 +77,7 @@ pub fn vote_callback(
     let clock = Clock::get()?;
     let current_timestamp = clock.unix_timestamp;
 
-    emit!(crate::VoteEvent {
+    emit!(VoteEvent {
         timestamp: current_timestamp,
     });
 
