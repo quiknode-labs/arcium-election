@@ -34,8 +34,8 @@ pub mod voting {
     /// * `id` - Unique identifier for this poll
     /// * `question` - The poll question voters will respond to
     /// * `nonce` - Cryptographic nonce for initializing encrypted vote counters
-    pub fn create_new_poll(
-        ctx: Context<CreateNewPoll>,
+    pub fn create_poll(
+        ctx: Context<CreatePoll>,
         computation_offset: u64,
         id: u32,
         question: String,
@@ -232,7 +232,7 @@ pub mod voting {
 #[queue_computation_accounts("init_vote_stats", payer)]
 #[derive(Accounts)]
 #[instruction(computation_offset: u64, id: u32)]
-pub struct CreateNewPoll<'info> {
+pub struct CreatePoll<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
     #[account(

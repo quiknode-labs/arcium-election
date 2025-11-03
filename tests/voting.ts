@@ -72,7 +72,7 @@ describe("Voting", () => {
       const pollComputationOffset = getRandomBigNumber();
 
       const createPollSignature = await program.methods
-        .createNewPoll(
+        .createPoll(
           pollComputationOffset,
           pollId,
           `Poll ${pollId}: $SOL to 500?`,
