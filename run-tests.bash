@@ -5,7 +5,7 @@
 #
 # Why is this needed?
 # - Arcium computation definitions are onchain accounts (PDAs) that persist across validator runs
-# - Computation definitions register encrypted instructions (like "vote", "init_vote_stats", "reveal_result")
+# - Computation definitions register encrypted instructions (like "vote", "init_vote_counters", "reveal_result")
 # - They are initialized ONCE per deployment, not on every test run
 # - When running tests multiple times, the computation definition accounts from previous runs
 #   still exist in the validator's ledger, causing "account already in use" errors when trying
@@ -13,7 +13,7 @@
 #
 # Example error this fixes:
 #  'Program J7KTdhMTVhy7vtgyFSXi9SpptdTDmpg93pB53UdfuttF invoke [1]'
-#  'Program log: Instruction: InitVoteStatsCompDef'
+#  'Program log: Instruction: InitVoteCountersCompDef'
 #  'Program BKck65TgoKRokMjQM3datB9oRwJ8rAj2jxPXvHXUvcL6 invoke [2]'
 #  'Program log: Instruction: InitComputationDefinition'
 #  'Program 11111111111111111111111111111111 invoke [3]'

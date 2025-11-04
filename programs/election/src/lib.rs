@@ -23,8 +23,8 @@ declare_id!("J7KTdhMTVhy7vtgyFSXi9SpptdTDmpg93pB53UdfuttF");
 pub mod election {
     use super::*;
 
-    pub fn init_vote_stats_comp_def(ctx: Context<InitVoteStatsCompDef>) -> Result<()> {
-        handlers::init_vote_stats::init_vote_stats_comp_def(ctx)
+    pub fn init_vote_counters_comp_def(ctx: Context<InitVoteCountersCompDef>) -> Result<()> {
+        handlers::init_vote_counters::init_vote_counters_comp_def(ctx)
     }
 
     pub fn create_poll(
@@ -37,12 +37,12 @@ pub mod election {
         handlers::create_poll::create_poll(ctx, computation_offset, id, question, nonce)
     }
 
-    #[arcium_callback(encrypted_ix = "init_vote_stats")]
-    pub fn init_vote_stats_callback(
-        ctx: Context<InitVoteStatsCallback>,
-        output: ComputationOutputs<InitVoteStatsOutput>,
+    #[arcium_callback(encrypted_ix = "init_vote_counters")]
+    pub fn init_vote_counters_callback(
+        ctx: Context<InitVoteCountersCallback>,
+        output: ComputationOutputs<InitVoteCountersOutput>,
     ) -> Result<()> {
-        handlers::init_vote_stats::init_vote_stats_callback(ctx, output)
+        handlers::init_vote_counters::init_vote_counters_callback(ctx, output)
     }
 
     pub fn init_vote_comp_def(ctx: Context<InitVoteCompDef>) -> Result<()> {
@@ -92,9 +92,9 @@ pub mod election {
     // Account struct definitions - these need to be inside the arcium_program module
     // so they can access the generated SignerAccount type
 
-    #[init_computation_definition_accounts("init_vote_stats", payer)]
+    #[init_computation_definition_accounts("init_vote_counters", payer)]
     #[derive(Accounts)]
-    pub struct InitVoteStatsCompDef<'info> {
+    pub struct InitVoteCountersCompDef<'info> {
         #[account(mut)]
         pub payer: Signer<'info>,
 
@@ -114,13 +114,13 @@ pub mod election {
         pub system_program: Program<'info, System>,
     }
 
-    #[callback_accounts("init_vote_stats")]
+    #[callback_accounts("init_vote_counters")]
     #[derive(Accounts)]
-    pub struct InitVoteStatsCallback<'info> {
+    pub struct InitVoteCountersCallback<'info> {
         pub arcium_program: Program<'info, Arcium>,
 
         #[account(
-            address = derive_comp_def_pda!(COMP_DEF_OFFSET_INIT_VOTE_STATS)
+            address = derive_comp_def_pda!(COMP_DEF_OFFSET_INIT_VOTE_COUNTERS)
         )]
         pub comp_def_account: Account<'info, ComputationDefinitionAccount>,
 
@@ -133,7 +133,7 @@ pub mod election {
         pub poll_acc: Account<'info, Poll>,
     }
 
-    #[queue_computation_accounts("init_vote_stats", payer)]
+    #[queue_computation_accounts("init_vote_counters", payer)]
     #[derive(Accounts)]
     #[instruction(computation_offset: u64, id: u32)]
     pub struct CreatePoll<'info> {
@@ -171,7 +171,7 @@ pub mod election {
         /// CHECK: computation_account, checked by the arcium program.
         pub computation_account: UncheckedAccount<'info>,
         #[account(
-            address = derive_comp_def_pda!(COMP_DEF_OFFSET_INIT_VOTE_STATS)
+            address = derive_comp_def_pda!(COMP_DEF_OFFSET_INIT_VOTE_COUNTERS)
         )]
         pub comp_def_account: Account<'info, ComputationDefinitionAccount>,
         #[account(
@@ -441,9 +441,9 @@ pub use election::{
     CreatePoll,
     InitRevealResultCompDef,
     InitVoteCompDef,
-    InitVoteStatsCallback,
-    InitVoteStatsCompDef,
-    InitVoteStatsOutput,
+    InitVoteCountersCallback,
+    InitVoteCountersCompDef,
+    InitVoteCountersOutput,
     RevealResultCallback,
     RevealResultOutput,
     RevealVotingResult,

@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use arcium_anchor::prelude::*;
 use arcium_client::idl::arcium::types::CallbackAccount;
 
-use crate::{CreatePoll, InitVoteStatsCallback};
+use crate::{CreatePoll, InitVoteCountersCallback};
 
 /// Creates a new confidential poll with the given question.
 ///
@@ -41,7 +41,7 @@ pub fn create_poll(
         computation_offset,
         computation_args,
         None,
-        vec![InitVoteStatsCallback::callback_ix(&[CallbackAccount {
+        vec![InitVoteCountersCallback::callback_ix(&[CallbackAccount {
             pubkey: ctx.accounts.poll_acc.key(),
             is_writable: true,
         }])],

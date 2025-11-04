@@ -55,11 +55,11 @@ describe("Election", () => {
     pollAuthority = await getKeypairFromFile(`${os.homedir()}/.config/solana/id.json`);
 
     // Computation definitions are persistent onchain PDAs that register encrypted instructions
-    // (like "vote", "init_vote_stats", "reveal_result"). They must be initialized ONCE per
+    // (like "vote", "init_vote_counters", "reveal_result"). They must be initialized ONCE per
     // deployment/test session. Re-initializing them in the same session would cause "account
     // already in use" errors since the accounts already exist onchain. This setup is separate
     // from test logic and only needs to happen once before running any tests.
-    await initVoteStatsCompDef(program, pollAuthority, false, false);
+    await initVoteCountersCompDef(program, pollAuthority, false, false);
     await initVoteCompDef(program, pollAuthority, false, false);
     await initRevealResultCompDef(program, pollAuthority, false, false);
 
@@ -87,7 +87,7 @@ describe("Election", () => {
         executingPool: getExecutingPoolAccAddress(program.programId),
         compDefAccount: getCompDefAccAddress(
           program.programId,
-          Buffer.from(getCompDefAccOffset("init_vote_stats")).readUInt32LE()
+          Buffer.from(getCompDefAccOffset("init_vote_counters")).readUInt32LE()
         ),
       })
       .rpc({ skipPreflight: true, commitment: "confirmed" });
@@ -105,6 +105,11 @@ describe("Election", () => {
   });
 
   test("users can vote on polls!", async () => {
+    // Create separate users: alice, bob, and carol
+    const alice = Keypair.generate();
+    const bob = Keypair.generate();
+    const carol = Keypair.generate();
+
     // Define votes for each user
     // Alice votes NeoRobot, Bob votes NeoRobot, Carol votes HumaneAIPIN
     // Expected: NeoRobot wins (2 votes)
@@ -131,10 +136,7 @@ describe("Election", () => {
 
     const expectedOutcome = calculateExpectedOutcome(aliceChoice, bobChoice, carolChoice);
 
-    // Create separate users: alice, bob, and carol
-    const alice = Keypair.generate();
-    const bob = Keypair.generate();
-    const carol = Keypair.generate();
+
 
     // Fund voters with SOL for transaction fees (1 SOL each)
     await airdropIfRequired(
@@ -281,7 +283,7 @@ describe("Election", () => {
     assert.equal(revealEvent.output, expectedOutcome);
   });
 
-  const initVoteStatsCompDef = async (
+  const initVoteCountersCompDef = async (
     program: Program<Election>,
     pollAuthority: anchor.web3.Keypair,
     uploadRawCircuit: boolean,
@@ -290,7 +292,7 @@ describe("Election", () => {
     const baseSeedCompDefAcc = getArciumAccountBaseSeed(
       "ComputationDefinitionAccount"
     );
-    const offset = getCompDefAccOffset("init_vote_stats");
+    const offset = getCompDefAccOffset("init_vote_counters");
 
     const compDefPDA = PublicKey.findProgramAddressSync(
       [baseSeedCompDefAcc, program.programId.toBuffer(), offset],
@@ -298,12 +300,12 @@ describe("Election", () => {
     )[0];
 
     console.log(
-      "Init vote stats computation definition pda is ",
+      "Init vote counters computation definition pda is ",
       compDefPDA.toBase58()
     );
 
     const transactionSignature = await program.methods
-      .initVoteStatsCompDef()
+      .initVoteCountersCompDef()
       .accounts({
         compDefAccount: compDefPDA,
         payer: pollAuthority.publicKey,
@@ -314,14 +316,14 @@ describe("Election", () => {
         commitment: "confirmed",
         preflightCommitment: "confirmed",
       });
-    console.log("Init vote stats computation definition transaction", transactionSignature);
+    console.log("Init vote counters computation definition transaction", transactionSignature);
 
     if (uploadRawCircuit) {
-      const rawCircuit = await fs.readFile("build/init_vote_stats.arcis");
+      const rawCircuit = await fs.readFile("build/init_vote_counters.arcis");
 
       await uploadCircuit(
         provider as anchor.AnchorProvider,
-        "init_vote_stats",
+        "init_vote_counters",
         program.programId,
         rawCircuit,
         true
