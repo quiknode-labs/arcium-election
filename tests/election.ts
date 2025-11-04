@@ -123,20 +123,12 @@ describe("Election", () => {
       bobChoice: number,
       carolChoice: number
     ): number => {
-      const votes = [aliceChoice, bobChoice, carolChoice];
       const counts: Array<number> = [0, 0, 0];
-      votes.forEach((vote) => {
-        counts[vote]++;
-      });
-      // Return the index with the highest count
-      // TODO: Handle tie votes - currently returns the first option with max votes in case of ties
-      const maxCount = Math.max(...counts);
-      return counts.indexOf(maxCount);
+      [aliceChoice, bobChoice, carolChoice].forEach(vote => counts[vote]++);
+      return counts.indexOf(Math.max(...counts));
     };
 
     const expectedOutcome = calculateExpectedOutcome(aliceChoice, bobChoice, carolChoice);
-
-
 
     // Fund voters with SOL for transaction fees (1 SOL each)
     await airdropIfRequired(
