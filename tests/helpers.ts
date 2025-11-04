@@ -39,7 +39,7 @@ export const getMXEPublicKeyWithRetry = async (
  * 
  * This helper exists because Arcium requires each user to establish a shared secret with the
  * MXE (Multi-Party Execution Environment) before they can encrypt/decrypt confidential data.
- * The process involves: (1) fetching the MXE's public key from the on-chain program,
+ * The process involves: (1) fetching the MXE's public key from the onchain program,
  * (2) generating a client-side x25519 key pair, and (3) computing a shared secret using
  * Diffie-Hellman key exchange. The shared secret is then used with RescueCipher to encrypt
  * votes before sending them to the program, ensuring votes remain confidential throughout

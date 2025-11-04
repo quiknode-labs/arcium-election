@@ -1,13 +1,13 @@
 # Standalone Arcium Election Example
 
-Based on the https://github.com/arcium-hq/examples voting' app with a significnt number of fixes (see CHANGELOG), including fixes to race conditions, code cleanups, better tests, and more consistent naming.
+Based on the https://github.com/arcium-hq/examples voting' app with a significnt number of fixes (see CHANGELOG), including fixes to race conditions, changing from one user voting on multiple polls to 3 users voting on a single poll, code cleanups, better tests, and more consistent naming.
 
 ## To Run
 
 - Install Arcium
 - Use older Anchor 
 `avm use 0.31.1`
-- use custom version of Rust Arcium wants:
+- Use custom version of Rust Arcium wants:
 - `unset RUSTUP_TOOLCHAIN`
 
 - Get Docker https://docs.docker.com/desktop/setup/install/mac-install/
@@ -47,7 +47,7 @@ const pollSig = await program.methods.createNewPoll(
 
 - Creates a new poll with a unique ID and title
 - Uses a cryptographic nonce for security operations
-- Establishes the voting context on-chain
+- Establishes the voting context onchain
 
 ### 2. Voting Process
 
@@ -60,7 +60,7 @@ const ciphertext = cipher.encrypt(plaintext, nonce);
 
 - Votes are encrypted using x25519 (key exchange) and RescueCipher
 - Each vote uses a unique nonce for security
-- Votes remain confidential even when stored on-chain
+- Votes remain confidential even when stored onchain
 
 ### 3. Confidential Computation
 

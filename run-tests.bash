@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Fixed 'account already in use' errors by killing the validator and removing the test ledger
 
-# This script ensures a clean test environment by removing any persisted on-chain state.
+# This script ensures a clean test environment by removing any persisted onchain state.
 #
 # Why is this needed?
-# - Arcium computation definitions are on-chain accounts (PDAs) that persist across validator runs
+# - Arcium computation definitions are onchain accounts (PDAs) that persist across validator runs
 # - Computation definitions register encrypted instructions (like "vote", "init_vote_stats", "reveal_result")
 # - They are initialized ONCE per deployment, not on every test run
 # - When running tests multiple times, the computation definition accounts from previous runs
@@ -27,7 +27,7 @@ if pgrep -f "solana-test-validator" > /dev/null; then
   killall -TERM -w solana-test-validator 2>/dev/null || true
 fi
 
-# Remove the test ledger directory to clear all persisted on-chain accounts
+# Remove the test ledger directory to clear all persisted onchain accounts
 # This includes computation definitions, polls, and any other accounts from previous test runs
 rm -rf .anchor/test-ledger
 
