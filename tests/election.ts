@@ -34,8 +34,8 @@ describe("Election", () => {
 
   const arciumEnv = getArciumEnv();
 
-  // The Poll IDs we're going to create
-  const pollIds = [420, 421, 422];
+  // The Poll ID we're going to create
+  const pollId = 420;
 
   // Vote options enum: 0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com
   enum VoteOption {
@@ -54,90 +54,65 @@ describe("Election", () => {
   before(async () => {
     pollAuthority = await getKeypairFromFile(`${os.homedir()}/.config/solana/id.json`);
 
-    // Computation definitions are persistent on-chain PDAs that register encrypted instructions
+    // Computation definitions are persistent onchain PDAs that register encrypted instructions
     // (like "vote", "init_vote_stats", "reveal_result"). They must be initialized ONCE per
     // deployment/test session. Re-initializing them in the same session would cause "account
-    // already in use" errors since the accounts already exist on-chain. This setup is separate
+    // already in use" errors since the accounts already exist onchain. This setup is separate
     // from test logic and only needs to happen once before running any tests.
     await initVoteStatsCompDef(program, pollAuthority, false, false);
     await initVoteCompDef(program, pollAuthority, false, false);
     await initRevealResultCompDef(program, pollAuthority, false, false);
 
-    // Create multiple polls (owner creates them) before tests run.
-    // Polls are on-chain accounts that persist, so they're created once and reused across tests.
-    // This setup phase creates all polls that will be used in the election tests.
-    for (const pollId of pollIds) {
-      const pollNonce = randomBytes(16);
+    // Create the poll (owner creates it) before tests run.
+    // The poll is an onchain account that persists, so it's created once and reused across tests.
+    const pollNonce = randomBytes(16);
 
-      const pollComputationOffset = getRandomBigNumber();
+    const pollComputationOffset = getRandomBigNumber();
 
-      const createPollSignature = await program.methods
-        .createPoll(
-          pollComputationOffset,
-          pollId,
-          `Worst tech invention of 2025?`,
-          new anchor.BN(deserializeLE(pollNonce).toString())
-        )
-        .accountsPartial({
-          computationAccount: getComputationAccAddress(
-            program.programId,
-            pollComputationOffset
-          ),
-          clusterAccount: arciumEnv.arciumClusterPubkey,
-          mxeAccount: getMXEAccAddress(program.programId),
-          mempoolAccount: getMempoolAccAddress(program.programId),
-          executingPool: getExecutingPoolAccAddress(program.programId),
-          compDefAccount: getCompDefAccAddress(
-            program.programId,
-            Buffer.from(getCompDefAccOffset("init_vote_stats")).readUInt32LE()
-          ),
-        })
-        .rpc({ skipPreflight: true, commitment: "confirmed" });
-
-      console.log(`🆕 Poll ${pollId} created with signature`, createPollSignature);
-
-      const finalizePollSignature = await awaitComputationFinalization(
-        provider as anchor.AnchorProvider,
+    const createPollSignature = await program.methods
+      .createPoll(
         pollComputationOffset,
-        program.programId,
-        "confirmed"
-      );
-      console.log(`Finalize poll ${pollId} signature is `, finalizePollSignature);
-    }
-    console.log("✅ Polls created");
+        pollId,
+        `Worst tech invention of 2025?`,
+        new anchor.BN(deserializeLE(pollNonce).toString())
+      )
+      .accountsPartial({
+        computationAccount: getComputationAccAddress(
+          program.programId,
+          pollComputationOffset
+        ),
+        clusterAccount: arciumEnv.arciumClusterPubkey,
+        mxeAccount: getMXEAccAddress(program.programId),
+        mempoolAccount: getMempoolAccAddress(program.programId),
+        executingPool: getExecutingPoolAccAddress(program.programId),
+        compDefAccount: getCompDefAccAddress(
+          program.programId,
+          Buffer.from(getCompDefAccOffset("init_vote_stats")).readUInt32LE()
+        ),
+      })
+      .rpc({ skipPreflight: true, commitment: "confirmed" });
+
+    console.log(`🆕 Poll ${pollId} created with signature`, createPollSignature);
+
+    const finalizePollSignature = await awaitComputationFinalization(
+      provider as anchor.AnchorProvider,
+      pollComputationOffset,
+      program.programId,
+      "confirmed"
+    );
+    console.log(`Finalize poll ${pollId} signature is `, finalizePollSignature);
+    console.log("✅ Poll created");
   });
 
   test("users can vote on polls!", async () => {
-
-
-
     // Define votes for each user
-    // Users can vote the same choice across multiple polls
-    // Poll 420: Alice votes NeoRobot, Bob votes NeoRobot, Carol votes HumaneAIPIN
-    //   Expected: NeoRobot wins (2 votes)
-    // Poll 421: Alice votes HumaneAIPIN, Bob votes FriendCom, Carol votes HumaneAIPIN
-    //   Expected: HumaneAIPIN wins (2 votes)
-    // Poll 422: Alice votes NeoRobot, Bob votes NeoRobot, Carol votes FriendCom
-    //   Expected: NeoRobot wins (2 votes)
-    const alicePollsAndChoices = [
-      { pollId: 420, choice: VoteOption.NeoRobot },
-      { pollId: 421, choice: VoteOption.HumaneAIPIN },
-      { pollId: 422, choice: VoteOption.NeoRobot },
-    ];
+    // Alice votes NeoRobot, Bob votes NeoRobot, Carol votes HumaneAIPIN
+    // Expected: NeoRobot wins (2 votes)
+    const aliceChoice = VoteOption.NeoRobot;
+    const bobChoice = VoteOption.NeoRobot;
+    const carolChoice = VoteOption.HumaneAIPIN;
 
-    const bobPollsAndChoices = [
-      { pollId: 420, choice: VoteOption.NeoRobot },
-      { pollId: 421, choice: VoteOption.FriendCom },
-      { pollId: 422, choice: VoteOption.NeoRobot },
-    ];
-
-    const carolPollsAndChoices = [
-      { pollId: 420, choice: VoteOption.HumaneAIPIN },
-      { pollId: 421, choice: VoteOption.HumaneAIPIN },
-      { pollId: 422, choice: VoteOption.FriendCom },
-    ];
-
-    // Calculate expected outcomes based on majority vote from alice, bob, and carol
+    // Calculate expected outcome based on majority vote from alice, bob, and carol
     const calculateExpectedOutcome = (
       aliceChoice: number,
       bobChoice: number,
@@ -154,15 +129,7 @@ describe("Election", () => {
       return counts.indexOf(maxCount);
     };
 
-    const expectedOutcomes = pollIds.map((pollId) => {
-      const aliceVote = alicePollsAndChoices.find((alicePollAndChoice) => alicePollAndChoice.pollId === pollId)!.choice;
-      const bobVote = bobPollsAndChoices.find((bobPollAndChoice) => bobPollAndChoice.pollId === pollId)!.choice;
-      const carolVote = carolPollsAndChoices.find((carolPollAndChoice) => carolPollAndChoice.pollId === pollId)!.choice;
-      return {
-        pollId,
-        expectedOutcome: calculateExpectedOutcome(aliceVote, bobVote, carolVote),
-      };
-    });
+    const expectedOutcome = calculateExpectedOutcome(aliceChoice, bobChoice, carolChoice);
 
     // Create separate users: alice, bob, and carol
     const alice = Keypair.generate();
@@ -264,63 +231,54 @@ describe("Election", () => {
     };
 
     // Alice votes first
-    for (const { pollId, choice } of alicePollsAndChoices) {
-      await castVote(alice, "Alice", pollId, choice, aliceCipher, aliceKeys.publicKey);
-    }
+    await castVote(alice, "Alice", pollId, aliceChoice, aliceCipher, aliceKeys.publicKey);
 
     // Bob votes second
-    for (const { pollId, choice } of bobPollsAndChoices) {
-      await castVote(bob, "Bob", pollId, choice, bobCipher, bobKeys.publicKey);
-    }
+    await castVote(bob, "Bob", pollId, bobChoice, bobCipher, bobKeys.publicKey);
 
     // Carol votes third
-    for (const { pollId, choice } of carolPollsAndChoices) {
-      await castVote(carol, "Carol", pollId, choice, carolCipher, carolKeys.publicKey);
-    }
+    await castVote(carol, "Carol", pollId, carolChoice, carolCipher, carolKeys.publicKey);
 
-    // Reveal results for each poll and verify against expected outcomes
-    for (const { pollId, expectedOutcome } of expectedOutcomes) {
+    // Reveal results and verify against expected outcome
+    const revealEventPromise = awaitEvent(program, "revealResultEvent");
 
-      const revealEventPromise = awaitEvent(program, "revealResultEvent");
+    const revealComputationOffset = getRandomBigNumber();
 
-      const revealComputationOffset = getRandomBigNumber();
+    const revealQueueSignature = await program.methods
+      .revealResult(revealComputationOffset, pollId)
+      .accountsPartial({
+        computationAccount: getComputationAccAddress(
+          program.programId,
+          revealComputationOffset
+        ),
+        clusterAccount: arciumEnv.arciumClusterPubkey,
+        mxeAccount: getMXEAccAddress(program.programId),
+        mempoolAccount: getMempoolAccAddress(program.programId),
+        executingPool: getExecutingPoolAccAddress(program.programId),
+        compDefAccount: getCompDefAccAddress(
+          program.programId,
+          Buffer.from(getCompDefAccOffset("reveal_result")).readUInt32LE()
+        ),
+      })
+      .rpc({ skipPreflight: true, commitment: "confirmed" });
+    // console.log(`Reveal queue for poll ${pollId} signature is `, revealQueueSignature);
 
-      const revealQueueSignature = await program.methods
-        .revealResult(revealComputationOffset, pollId)
-        .accountsPartial({
-          computationAccount: getComputationAccAddress(
-            program.programId,
-            revealComputationOffset
-          ),
-          clusterAccount: arciumEnv.arciumClusterPubkey,
-          mxeAccount: getMXEAccAddress(program.programId),
-          mempoolAccount: getMempoolAccAddress(program.programId),
-          executingPool: getExecutingPoolAccAddress(program.programId),
-          compDefAccount: getCompDefAccAddress(
-            program.programId,
-            Buffer.from(getCompDefAccOffset("reveal_result")).readUInt32LE()
-          ),
-        })
-        .rpc({ skipPreflight: true, commitment: "confirmed" });
-      // console.log(`Reveal queue for poll ${pollId} signature is `, revealQueueSignature);
+    const revealFinalizeSignature = await awaitComputationFinalization(
+      provider as anchor.AnchorProvider,
+      revealComputationOffset,
+      program.programId,
+      "confirmed"
+    );
+    // console.log(
+    //   `Reveal finalize for poll ${pollId} signature is `,
+    //   revealFinalizeSignature
+    // );
 
-      const revealFinalizeSignature = await awaitComputationFinalization(
-        provider as anchor.AnchorProvider,
-        revealComputationOffset,
-        program.programId,
-        "confirmed"
-      );
-      // console.log(
-      //   `Reveal finalize for poll ${pollId} signature is `,
-      //   revealFinalizeSignature
-      // );
-
-      const revealEvent = await revealEventPromise;
-      console.log(
-        `🏆 Decrypted winner for poll ${pollId} is "${getOptionName(revealEvent.output)}"`
-      );
-      assert.equal(revealEvent.output, expectedOutcome);
-    }
+    const revealEvent = await revealEventPromise;
+    console.log(
+      `🏆 Decrypted winner for poll ${pollId} is "${getOptionName(revealEvent.output)}"`
+    );
+    assert.equal(revealEvent.output, expectedOutcome);
   });
 
   const initVoteStatsCompDef = async (
