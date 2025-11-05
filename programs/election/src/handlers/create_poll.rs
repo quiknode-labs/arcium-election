@@ -2,9 +2,11 @@ use anchor_lang::prelude::*;
 use arcium_anchor::prelude::*;
 use arcium_client::idl::arcium::types::CallbackAccount;
 
-use crate::{error::ErrorCode, CreatePoll, InitPollCallback, InitPollCompDef, InitPollOutput};
+use crate::{
+    error::ErrorCode, CreatePoll, CreatePollCallback, CreatePollCompDef, CreatePollOutput,
+};
 
-pub fn init_poll_comp_def(ctx: Context<InitPollCompDef>) -> Result<()> {
+pub fn create_poll_comp_def(ctx: Context<CreatePollCompDef>) -> Result<()> {
     init_comp_def(ctx.accounts, true, 0, None, None)?;
     Ok(())
 }
@@ -46,7 +48,7 @@ pub fn create_poll(
         computation_offset,
         computation_args,
         None,
-        vec![InitPollCallback::callback_ix(&[CallbackAccount {
+        vec![CreatePollCallback::callback_ix(&[CallbackAccount {
             pubkey: ctx.accounts.poll_acc.key(),
             is_writable: true,
         }])],
@@ -55,12 +57,12 @@ pub fn create_poll(
     Ok(())
 }
 
-pub fn init_poll_callback(
-    ctx: Context<InitPollCallback>,
-    output: ComputationOutputs<InitPollOutput>,
+pub fn create_poll_callback(
+    ctx: Context<CreatePollCallback>,
+    output: ComputationOutputs<CreatePollOutput>,
 ) -> Result<()> {
     let computation_result = match output {
-        ComputationOutputs::Success(InitPollOutput { field_0 }) => field_0,
+        ComputationOutputs::Success(CreatePollOutput { field_0 }) => field_0,
         _ => return Err(ErrorCode::AbortedComputation.into()),
     };
 

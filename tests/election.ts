@@ -55,11 +55,11 @@ describe("Election", () => {
     pollAuthority = await getKeypairFromFile(`${os.homedir()}/.config/solana/id.json`);
 
     // Computation definitions are persistent onchain PDAs that register encrypted instructions
-    // (like "vote", "init_poll", "reveal_result"). They must be initialized ONCE per
+    // (like "vote", "create_poll", "reveal_result"). They must be initialized ONCE per
     // deployment/test session. Re-initializing them in the same session would cause "account
     // already in use" errors since the accounts already exist onchain. This setup is separate
     // from test logic and only needs to happen once before running any tests.
-    await initPollCompDef(program, pollAuthority, false, false);
+    await createPollCompDef(program, pollAuthority, false, false);
     await initVoteCompDef(program, pollAuthority, false, false);
     await initRevealResultCompDef(program, pollAuthority, false, false);
 
@@ -87,7 +87,7 @@ describe("Election", () => {
         executingPool: getExecutingPoolAccAddress(program.programId),
         compDefAccount: getCompDefAccAddress(
           program.programId,
-          Buffer.from(getCompDefAccOffset("init_poll")).readUInt32LE()
+          Buffer.from(getCompDefAccOffset("create_poll")).readUInt32LE()
         ),
       })
       .rpc({ skipPreflight: true, commitment: "confirmed" });
@@ -270,7 +270,7 @@ describe("Election", () => {
     assert.equal(revealEvent.output, expectedOutcome);
   });
 
-  const initPollCompDef = async (
+  const createPollCompDef = async (
     program: Program<Election>,
     pollAuthority: anchor.web3.Keypair,
     uploadRawCircuit: boolean,
@@ -279,20 +279,20 @@ describe("Election", () => {
     const baseSeedCompDefAcc = getArciumAccountBaseSeed(
       "ComputationDefinitionAccount"
     );
-    const offset = getCompDefAccOffset("init_poll");
+    const offset = getCompDefAccOffset("create_poll");
 
     const compDefPDA = PublicKey.findProgramAddressSync(
       [baseSeedCompDefAcc, program.programId.toBuffer(), offset],
       getArciumProgAddress()
     )[0];
 
-
-    //   "Init poll computation definition pda is ",
+    // console.log(
+    //   "Create poll computation definition pda is ",
     //   compDefPDA.toBase58()
     // );
 
     const transactionSignature = await program.methods
-      .initPollCompDef()
+      .createPollCompDef()
       .accounts({
         compDefAccount: compDefPDA,
         payer: pollAuthority.publicKey,
@@ -303,14 +303,14 @@ describe("Election", () => {
         commitment: "confirmed",
         preflightCommitment: "confirmed",
       });
-
+    // console.log("Create poll computation definition transaction", transactionSignature);
 
     if (uploadRawCircuit) {
-      const rawCircuit = await fs.readFile("build/init_poll.arcis");
+      const rawCircuit = await fs.readFile("build/create_poll.arcis");
 
       await uploadCircuit(
         provider as anchor.AnchorProvider,
-        "init_poll",
+        "create_poll",
         program.programId,
         rawCircuit,
         true

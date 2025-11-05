@@ -1,6 +1,6 @@
 # Standalone Arcium Election Example
 
-Based on the https://github.com/arcium-hq/examples voting' app with a significnt number of fixes (see CHANGELOG), including fixes to race conditions, changing from one user voting on multiple polls to 3 users voting on a single poll, code cleanups, better tests, and more consistent naming.
+Based on the https://github.com/arcium-hq/examples voting' app with a significant number of fixes (see git history), including fixes to race conditions, changing from one user voting on multiple polls to 3 users voting on a single poll, consisistent naming (between the comp def, handler, encrypted instruction handler and callback), and a simpler Anchor layout.
 
 ## To Run
 
@@ -11,10 +11,12 @@ Based on the https://github.com/arcium-hq/examples voting' app with a significnt
 - `unset RUSTUP_TOOLCHAIN`
 
 - Get Docker https://docs.docker.com/desktop/setup/install/mac-install/
-- Start Docker desktop (docker daemon not running)
+- Start Docker desktop (`docker daemon not running`)
 
-- arcium build
-- arcium test
+Run `bash run-tests.bash`. That will:
+
+ - Remove the old test-ledger, so the old compdef accounts are cleared out
+ - Run `arcium test` for you to build and run the tests.
 
 Race condition: https://github.com/arcium-hq/examples/issues/37
 Solana Kit tests: https://github.com/arcium-hq/examples/issues/36

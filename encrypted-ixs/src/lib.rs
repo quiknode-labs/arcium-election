@@ -19,7 +19,7 @@ mod circuits {
     /// Creates a VoteCounts structure with zero counts for all three voting options.
     /// The counters remain encrypted and can only be updated through MPC operations.
     #[instruction]
-    pub fn init_poll(mxe: Mxe) -> Enc<Mxe, VoteCounts> {
+    pub fn create_poll(mxe: Mxe) -> Enc<Mxe, VoteCounts> {
         let vote_counts: VoteCounts = [0, 0, 0];
         mxe.from_arcis(vote_counts)
     }
