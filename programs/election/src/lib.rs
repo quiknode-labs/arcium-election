@@ -23,8 +23,8 @@ declare_id!("J7KTdhMTVhy7vtgyFSXi9SpptdTDmpg93pB53UdfuttF");
 pub mod election {
     use super::*;
 
-    pub fn init_vote_counters_comp_def(ctx: Context<InitVoteCountersCompDef>) -> Result<()> {
-        handlers::init_vote_counters::init_vote_counters_comp_def(ctx)
+    pub fn init_poll_comp_def(ctx: Context<InitPollCompDef>) -> Result<()> {
+        handlers::create_poll::init_poll_comp_def(ctx)
     }
 
     pub fn create_poll(
@@ -37,12 +37,12 @@ pub mod election {
         handlers::create_poll::create_poll(ctx, computation_offset, id, question, nonce)
     }
 
-    #[arcium_callback(encrypted_ix = "init_vote_counters")]
-    pub fn init_vote_counters_callback(
-        ctx: Context<InitVoteCountersCallback>,
-        output: ComputationOutputs<InitVoteCountersOutput>,
+    #[arcium_callback(encrypted_ix = "init_poll")]
+    pub fn init_poll_callback(
+        ctx: Context<InitPollCallback>,
+        output: ComputationOutputs<InitPollOutput>,
     ) -> Result<()> {
-        handlers::init_vote_counters::init_vote_counters_callback(ctx, output)
+        handlers::create_poll::init_poll_callback(ctx, output)
     }
 
     pub fn init_vote_comp_def(ctx: Context<InitVoteCompDef>) -> Result<()> {
@@ -58,7 +58,14 @@ pub mod election {
         vote_encryption_pubkey: [u8; 32],
         vote_nonce: u128,
     ) -> Result<()> {
-        handlers::vote::vote(ctx, computation_offset, poll_id, vote, vote_encryption_pubkey, vote_nonce)
+        handlers::vote::vote(
+            ctx,
+            computation_offset,
+            poll_id,
+            vote,
+            vote_encryption_pubkey,
+            vote_nonce,
+        )
     }
 
     #[arcium_callback(encrypted_ix = "vote")]
@@ -92,9 +99,9 @@ pub mod election {
     // Account struct definitions - these need to be inside the arcium_program module
     // so they can access the generated SignerAccount type
 
-    #[init_computation_definition_accounts("init_vote_counters", payer)]
+    #[init_computation_definition_accounts("init_poll", payer)]
     #[derive(Accounts)]
-    pub struct InitVoteCountersCompDef<'info> {
+    pub struct InitPollCompDef<'info> {
         #[account(mut)]
         pub payer: Signer<'info>,
 
@@ -114,13 +121,13 @@ pub mod election {
         pub system_program: Program<'info, System>,
     }
 
-    #[callback_accounts("init_vote_counters")]
+    #[callback_accounts("init_poll")]
     #[derive(Accounts)]
-    pub struct InitVoteCountersCallback<'info> {
+    pub struct InitPollCallback<'info> {
         pub arcium_program: Program<'info, Arcium>,
 
         #[account(
-            address = derive_comp_def_pda!(COMP_DEF_OFFSET_INIT_VOTE_COUNTERS)
+            address = derive_comp_def_pda!(COMP_DEF_OFFSET_INIT_POLL)
         )]
         pub comp_def_account: Account<'info, ComputationDefinitionAccount>,
 
@@ -133,7 +140,7 @@ pub mod election {
         pub poll_acc: Account<'info, Poll>,
     }
 
-    #[queue_computation_accounts("init_vote_counters", payer)]
+    #[queue_computation_accounts("init_poll", payer)]
     #[derive(Accounts)]
     #[instruction(computation_offset: u64, id: u32)]
     pub struct CreatePoll<'info> {
@@ -171,7 +178,7 @@ pub mod election {
         /// CHECK: computation_account, checked by the arcium program.
         pub computation_account: UncheckedAccount<'info>,
         #[account(
-            address = derive_comp_def_pda!(COMP_DEF_OFFSET_INIT_VOTE_COUNTERS)
+            address = derive_comp_def_pda!(COMP_DEF_OFFSET_INIT_POLL)
         )]
         pub comp_def_account: Account<'info, ComputationDefinitionAccount>,
         #[account(
@@ -438,16 +445,7 @@ pub mod election {
 }
 
 pub use election::{
-    CreatePoll,
-    InitRevealResultCompDef,
-    InitVoteCompDef,
-    InitVoteCountersCallback,
-    InitVoteCountersCompDef,
-    InitVoteCountersOutput,
-    RevealResultCallback,
-    RevealResultOutput,
-    RevealVotingResult,
-    Vote,
-    VoteCallback,
-    VoteOutput,
+    CreatePoll, InitPollCallback, InitPollCompDef, InitPollOutput, InitRevealResultCompDef,
+    InitVoteCompDef, RevealResultCallback, RevealResultOutput, RevealVotingResult, Vote,
+    VoteCallback, VoteOutput,
 };

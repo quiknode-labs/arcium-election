@@ -2,7 +2,12 @@ use anchor_lang::prelude::*;
 use arcium_anchor::prelude::*;
 use arcium_client::idl::arcium::types::CallbackAccount;
 
-use crate::{CreatePoll, InitVoteCountersCallback};
+use crate::{error::ErrorCode, CreatePoll, InitPollCallback, InitPollCompDef, InitPollOutput};
+
+pub fn init_poll_comp_def(ctx: Context<InitPollCompDef>) -> Result<()> {
+    init_comp_def(ctx.accounts, true, 0, None, None)?;
+    Ok(())
+}
 
 /// Creates a new confidential poll with the given question.
 ///
@@ -41,11 +46,26 @@ pub fn create_poll(
         computation_offset,
         computation_args,
         None,
-        vec![InitVoteCountersCallback::callback_ix(&[CallbackAccount {
+        vec![InitPollCallback::callback_ix(&[CallbackAccount {
             pubkey: ctx.accounts.poll_acc.key(),
             is_writable: true,
         }])],
     )?;
+
+    Ok(())
+}
+
+pub fn init_poll_callback(
+    ctx: Context<InitPollCallback>,
+    output: ComputationOutputs<InitPollOutput>,
+) -> Result<()> {
+    let computation_result = match output {
+        ComputationOutputs::Success(InitPollOutput { field_0 }) => field_0,
+        _ => return Err(ErrorCode::AbortedComputation.into()),
+    };
+
+    ctx.accounts.poll_acc.vote_counts = computation_result.ciphertexts;
+    ctx.accounts.poll_acc.nonce = computation_result.nonce;
 
     Ok(())
 }
