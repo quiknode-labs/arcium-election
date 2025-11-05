@@ -4,6 +4,10 @@ use arcium_client::idl::arcium::types::CallbackAccount;
 
 use crate::{error::ErrorCode, state::{Poll, VoteEvent}, InitVoteCompDef, Vote, VoteCallback, VoteOutput};
 
+/// One-off job to create computation definition for `vote` in encrypted-ixs/src/lib.rs.
+///
+/// This initializes the onchain computation definition account that registers the encrypted
+/// instruction. Must be called once before using the `vote` encrypted instruction.
 pub fn init_vote_comp_def(ctx: Context<InitVoteCompDef>) -> Result<()> {
     init_comp_def(ctx.accounts, true, 0, None, None)?;
     Ok(())

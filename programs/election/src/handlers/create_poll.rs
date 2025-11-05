@@ -6,6 +6,10 @@ use crate::{
     error::ErrorCode, CreatePoll, CreatePollCallback, CreatePollCompDef, CreatePollOutput,
 };
 
+/// One-off job to create computation definition for `create_poll` in encrypted-ixs/src/lib.rs.
+///
+/// This initializes the onchain computation definition account that registers the encrypted
+/// instruction. Must be called once before using the `create_poll` encrypted instruction.
 pub fn create_poll_comp_def(ctx: Context<CreatePollCompDef>) -> Result<()> {
     init_comp_def(ctx.accounts, true, 0, None, None)?;
     Ok(())

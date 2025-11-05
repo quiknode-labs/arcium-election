@@ -1,8 +1,16 @@
 use anchor_lang::prelude::*;
 use arcium_anchor::prelude::*;
 
-use crate::{error::ErrorCode, state::{Poll, RevealResultEvent}, InitRevealResultCompDef, RevealResultCallback, RevealResultOutput, RevealVotingResult};
+use crate::{
+    error::ErrorCode,
+    state::{Poll, RevealResultEvent},
+    InitRevealResultCompDef, RevealResultCallback, RevealResultOutput, RevealVotingResult,
+};
 
+/// One-off job to create computation definition for `reveal_result` in encrypted-ixs/src/lib.rs.
+///
+/// This initializes the onchain computation definition account that registers the encrypted
+/// instruction. Must be called once before using the `reveal_result` encrypted instruction.
 pub fn init_reveal_result_comp_def(ctx: Context<InitRevealResultCompDef>) -> Result<()> {
     init_comp_def(ctx.accounts, true, 0, None, None)?;
     Ok(())
