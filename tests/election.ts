@@ -92,7 +92,6 @@ describe("Election", () => {
       })
       .rpc({ skipPreflight: true, commitment: "confirmed" });
 
-    console.log(`🆕 Poll ${pollId} created with signature`, createPollSignature);
 
     const finalizePollSignature = await awaitComputationFinalization(
       provider as anchor.AnchorProvider,
@@ -100,11 +99,10 @@ describe("Election", () => {
       program.programId,
       "confirmed"
     );
-    console.log(`Finalize poll ${pollId} signature is `, finalizePollSignature);
-    console.log("✅ Poll created");
+    console.log(`🆕 Poll ID ${pollId} created`);
   });
 
-  test("users can vote on polls!", async () => {
+  test("users can vote on polls without revealing their choices!", async () => {
     // Create separate users: alice, bob, and carol
     const alice = Keypair.generate();
     const bob = Keypair.generate();
@@ -152,16 +150,18 @@ describe("Election", () => {
 
     // Create encryption keys for each user
     const aliceKeys = await makeClientSideKeys(provider as anchor.AnchorProvider, program.programId);
-    // console.log("MXE x25519 pubkey for alice is", aliceKeys.publicKey);
+
     const bobKeys = await makeClientSideKeys(provider as anchor.AnchorProvider, program.programId);
-    // console.log("MXE x25519 pubkey for bob is", bobKeys.publicKey);
+
     const carolKeys = await makeClientSideKeys(provider as anchor.AnchorProvider, program.programId);
-    // console.log("MXE x25519 pubkey for carol is", carolKeys.publicKey);
+
 
     // Create encryption ciphers for each user
     const aliceCipher = new RescueCipher(aliceKeys.sharedSecret);
     const bobCipher = new RescueCipher(bobKeys.sharedSecret);
     const carolCipher = new RescueCipher(carolKeys.sharedSecret);
+
+    console.log(`👬 Created wallets and encryption ciphers for Alice, Bob, and Carol`);
 
     // Helper function to cast a vote
     const castVote = async (
@@ -175,8 +175,6 @@ describe("Election", () => {
       const plaintext = [BigInt(choice)];
       const nonce = randomBytes(16);
       const ciphertext = cipher.encrypt(plaintext, nonce);
-
-      console.log(`${voterName} voting for poll ${pollId}: ${getOptionName(choice)}`);
 
       const voteComputationOffset = getRandomBigNumber();
       const voteEventPromise = awaitEvent(program, "voteEvent");
@@ -207,7 +205,6 @@ describe("Election", () => {
         })
         .signers([voter])
         .rpc({ skipPreflight: true, commitment: "confirmed" });
-      console.log(`${voterName} queue vote for poll ${pollId} signature is `, queueVoteSignature);
 
       const finalizeVoteSignature = await awaitComputationFinalization(
         provider as anchor.AnchorProvider,
@@ -215,12 +212,10 @@ describe("Election", () => {
         program.programId,
         "confirmed"
       );
-      console.log(`${voterName} finalize vote for poll ${pollId} signature is `, finalizeVoteSignature);
 
       const voteEvent = await voteEventPromise;
       console.log(
-        `🗳️ ${voterName} voted ${getOptionName(choice)} (${choice}) for poll ${pollId} at timestamp `,
-        voteEvent.timestamp.toString()
+        `🗳️  ${voterName} voted ${getOptionName(choice)} (${choice}) for poll ${pollId}`
       );
     };
 
@@ -255,7 +250,7 @@ describe("Election", () => {
         ),
       })
       .rpc({ skipPreflight: true, commitment: "confirmed" });
-    // console.log(`Reveal queue for poll ${pollId} signature is `, revealQueueSignature);
+
 
     const revealFinalizeSignature = await awaitComputationFinalization(
       provider as anchor.AnchorProvider,
@@ -263,7 +258,7 @@ describe("Election", () => {
       program.programId,
       "confirmed"
     );
-    // console.log(
+
     //   `Reveal finalize for poll ${pollId} signature is `,
     //   revealFinalizeSignature
     // );
@@ -291,7 +286,7 @@ describe("Election", () => {
       getArciumProgAddress()
     )[0];
 
-    // console.log(
+
     //   "Init poll computation definition pda is ",
     //   compDefPDA.toBase58()
     // );
@@ -308,7 +303,7 @@ describe("Election", () => {
         commitment: "confirmed",
         preflightCommitment: "confirmed",
       });
-    // console.log("Init poll computation definition transaction", transactionSignature);
+
 
     if (uploadRawCircuit) {
       const rawCircuit = await fs.readFile("build/init_poll.arcis");
@@ -354,7 +349,7 @@ describe("Election", () => {
       getArciumProgAddress()
     )[0];
 
-    // console.log("Vote computation definition pda is ", compDefPDA.toBase58());
+
 
     const transactionSignature = await program.methods
       .initVoteCompDef()
@@ -368,7 +363,7 @@ describe("Election", () => {
         commitment: "confirmed",
         preflightCommitment: "confirmed",
       });
-    // console.log("Init vote computation definition transaction", transactionSignature);
+
 
     if (uploadRawCircuit) {
       const rawCircuit = await fs.readFile("build/vote.arcis");
@@ -414,7 +409,7 @@ describe("Election", () => {
       getArciumProgAddress()
     )[0];
 
-    // console.log(
+
     //   "Reveal result computation definition pda is ",
     //   compDefPDA.toBase58()
     // );
@@ -431,7 +426,7 @@ describe("Election", () => {
         commitment: "confirmed",
         preflightCommitment: "confirmed",
       });
-    // console.log("Init reveal result computation definition transaction", transactionSignature);
+
 
     if (uploadRawCircuit) {
       const rawCircuit = await fs.readFile("build/reveal_result.arcis");

@@ -21,10 +21,4 @@
 
 - Don't stop until `run-tests.bash` passes on the code you have made.
 
-- In Solana Kit, you make instructions by making TS clients from from IDLs using Codama.\
-
-export const keypairToSigner = async (legacyWallet: any) => {
-  const keypair = await fromLegacyKeypair(legacyWallet);
-  const signer: KeyPairSigner = await createSignerFromKeyPair(keypair);
-  return signer;
-};
+- In Solana Kit, you make instructions by making TS clients from from IDLs using Codama.
