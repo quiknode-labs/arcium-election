@@ -291,10 +291,10 @@ describe("Election", () => {
       getArciumProgAddress()
     )[0];
 
-    console.log(
-      "Init vote counters computation definition pda is ",
-      compDefPDA.toBase58()
-    );
+    // console.log(
+    //   "Init vote counters computation definition pda is ",
+    //   compDefPDA.toBase58()
+    // );
 
     const transactionSignature = await program.methods
       .initVoteCountersCompDef()
@@ -308,7 +308,7 @@ describe("Election", () => {
         commitment: "confirmed",
         preflightCommitment: "confirmed",
       });
-    console.log("Init vote counters computation definition transaction", transactionSignature);
+    // console.log("Init vote counters computation definition transaction", transactionSignature);
 
     if (uploadRawCircuit) {
       const rawCircuit = await fs.readFile("build/init_vote_counters.arcis");
@@ -354,7 +354,7 @@ describe("Election", () => {
       getArciumProgAddress()
     )[0];
 
-    console.log("Vote computation definition pda is ", compDefPDA.toBase58());
+    // console.log("Vote computation definition pda is ", compDefPDA.toBase58());
 
     const transactionSignature = await program.methods
       .initVoteCompDef()
@@ -368,7 +368,7 @@ describe("Election", () => {
         commitment: "confirmed",
         preflightCommitment: "confirmed",
       });
-    console.log("Init vote computation definition transaction", transactionSignature);
+    // console.log("Init vote computation definition transaction", transactionSignature);
 
     if (uploadRawCircuit) {
       const rawCircuit = await fs.readFile("build/vote.arcis");
@@ -414,10 +414,10 @@ describe("Election", () => {
       getArciumProgAddress()
     )[0];
 
-    console.log(
-      "Reveal result computation definition pda is ",
-      compDefPDA.toBase58()
-    );
+    // console.log(
+    //   "Reveal result computation definition pda is ",
+    //   compDefPDA.toBase58()
+    // );
 
     const transactionSignature = await program.methods
       .initRevealResultCompDef()
@@ -431,7 +431,7 @@ describe("Election", () => {
         commitment: "confirmed",
         preflightCommitment: "confirmed",
       });
-    console.log("Init reveal result computation definition transaction", transactionSignature);
+    // console.log("Init reveal result computation definition transaction", transactionSignature);
 
     if (uploadRawCircuit) {
       const rawCircuit = await fs.readFile("build/reveal_result.arcis");
