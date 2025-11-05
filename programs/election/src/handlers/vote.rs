@@ -2,7 +2,11 @@ use anchor_lang::prelude::*;
 use arcium_anchor::prelude::*;
 use arcium_client::idl::arcium::types::CallbackAccount;
 
-use crate::{error::ErrorCode, state::{Poll, VoteEvent}, InitVoteCompDef, Vote, VoteCallback, VoteOutput};
+use crate::{
+    error::ErrorCode,
+    state::{Poll, VoteEvent},
+    InitVoteCompDef, Vote, VoteCallback, VoteOutput,
+};
 
 /// One-off job to create computation definition for `vote` in encrypted-ixs/src/lib.rs.
 ///
@@ -21,7 +25,7 @@ pub fn init_vote_comp_def(ctx: Context<InitVoteCompDef>) -> Result<()> {
 ///
 /// # Arguments
 /// * `poll_id` - The poll ID (used for account derivation via Anchor's #[instruction] attribute)
-/// * `vote` - Encrypted vote (0, 1, or 2 for the three options)
+/// * `choice` - Encrypted vote choice (0, 1, or 2 for the three options)
 /// * `vote_encryption_pubkey` - Voter's public key for encryption
 /// * `vote_nonce` - Cryptographic nonce for the vote encryption
 ///
@@ -34,14 +38,14 @@ pub fn vote(
     ctx: Context<Vote>,
     computation_offset: u64,
     poll_id: u32,
-    vote: [u8; 32],
+    choice: [u8; 32],
     vote_encryption_pubkey: [u8; 32],
     vote_nonce: u128,
 ) -> Result<()> {
     let computation_args = vec![
         Argument::ArcisPubkey(vote_encryption_pubkey),
         Argument::PlaintextU128(vote_nonce),
-        Argument::EncryptedU8(vote),
+        Argument::EncryptedU8(choice),
         Argument::PlaintextU128(ctx.accounts.poll_acc.nonce),
         Argument::Account(
             ctx.accounts.poll_acc.key(),

@@ -54,7 +54,7 @@ pub mod election {
         ctx: Context<Vote>,
         computation_offset: u64,
         poll_id: u32,
-        vote: [u8; 32],
+        choice: [u8; 32],
         vote_encryption_pubkey: [u8; 32],
         vote_nonce: u128,
     ) -> Result<()> {
@@ -62,7 +62,7 @@ pub mod election {
             ctx,
             computation_offset,
             poll_id,
-            vote,
+            choice,
             vote_encryption_pubkey,
             vote_nonce,
         )
@@ -311,6 +311,7 @@ pub mod election {
         pub arcium_program: Program<'info, Arcium>,
 
         /// CHECK: Poll authority pubkey
+
         #[account(
             address = poll_acc.authority,
         )]
