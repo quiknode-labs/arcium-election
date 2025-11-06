@@ -81,7 +81,7 @@ pub mod election {
     }
 
     pub fn reveal_result(
-        ctx: Context<RevealVotingResult>,
+        ctx: Context<RevealResult>,
         computation_offset: u64,
         id: u32,
     ) -> Result<()> {
@@ -368,7 +368,7 @@ pub mod election {
     #[queue_computation_accounts("reveal_result", payer)]
     #[derive(Accounts)]
     #[instruction(computation_offset: u64, id: u32)]
-    pub struct RevealVotingResult<'info> {
+    pub struct RevealResult<'info> {
         #[account(mut)]
         pub payer: Signer<'info>,
 
@@ -459,6 +459,6 @@ pub mod election {
 
 pub use election::{
     CreatePoll, CreatePollCallback, CreatePollCompDef, CreatePollOutput, InitRevealResultCompDef,
-    InitVoteCompDef, RevealResultCallback, RevealResultOutput, RevealVotingResult, Vote,
-    VoteCallback, VoteOutput,
+    InitVoteCompDef, RevealResult, RevealResultCallback, RevealResultOutput, Vote, VoteCallback,
+    VoteOutput,
 };

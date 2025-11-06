@@ -4,7 +4,7 @@ use arcium_anchor::prelude::*;
 use crate::{
     error::ErrorCode,
     state::{Poll, RevealResultEvent},
-    InitRevealResultCompDef, RevealResultCallback, RevealResultOutput, RevealVotingResult,
+    InitRevealResultCompDef, RevealResult, RevealResultCallback, RevealResultOutput,
 };
 
 /// One-off job to create computation definition for `reveal_result` in encrypted-ixs/src/lib.rs.
@@ -23,11 +23,7 @@ pub fn init_reveal_result_comp_def(ctx: Context<InitRevealResultCompDef>) -> Res
 ///
 /// # Arguments
 /// * `id` - The poll ID to reveal results for
-pub fn reveal_result(
-    ctx: Context<RevealVotingResult>,
-    computation_offset: u64,
-    id: u32,
-) -> Result<()> {
+pub fn reveal_result(ctx: Context<RevealResult>, computation_offset: u64, id: u32) -> Result<()> {
     require!(
         ctx.accounts.payer.key() == ctx.accounts.poll_account.authority,
         ErrorCode::InvalidAuthority
