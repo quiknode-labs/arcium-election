@@ -135,9 +135,9 @@ pub mod election {
         /// CHECK: instructions_sysvar, checked by the account constraint
         pub instructions_sysvar: AccountInfo<'info>,
 
-        /// CHECK: poll_acc, checked by the callback account key passed in queue_computation
+        /// CHECK: poll_account, checked by the callback account key passed in queue_computation
         #[account(mut)]
-        pub poll_acc: Account<'info, Poll>,
+        pub poll_account: Account<'info, Poll>,
     }
 
     #[queue_computation_accounts("create_poll", payer)]
@@ -216,7 +216,7 @@ pub mod election {
             seeds = [b"poll", payer.key().as_ref(), id.to_le_bytes().as_ref()],
             bump,
         )]
-        pub poll_acc: Account<'info, Poll>,
+        pub poll_account: Account<'info, Poll>,
     }
 
     #[init_computation_definition_accounts("vote", payer)]
@@ -313,16 +313,16 @@ pub mod election {
         /// CHECK: Poll authority pubkey
 
         #[account(
-            address = poll_acc.authority,
+            address = poll_account.authority,
         )]
         pub authority: UncheckedAccount<'info>,
 
         #[account(
             seeds = [b"poll", authority.key().as_ref(), poll_id.to_le_bytes().as_ref()],
-            bump = poll_acc.bump,
+            bump = poll_account.bump,
             has_one = authority
         )]
-        pub poll_acc: Account<'info, Poll>,
+        pub poll_account: Account<'info, Poll>,
     }
 
     #[callback_accounts("vote")]
@@ -340,7 +340,7 @@ pub mod election {
         pub instructions_sysvar: AccountInfo<'info>,
 
         #[account(mut)]
-        pub poll_acc: Account<'info, Poll>,
+        pub poll_account: Account<'info, Poll>,
     }
 
     #[init_computation_definition_accounts("reveal_result", payer)]
@@ -436,9 +436,9 @@ pub mod election {
 
         #[account(
             seeds = [b"poll", payer.key().as_ref(), id.to_le_bytes().as_ref()],
-            bump = poll_acc.bump
+            bump = poll_account.bump
         )]
-        pub poll_acc: Account<'info, Poll>,
+        pub poll_account: Account<'info, Poll>,
     }
 
     #[callback_accounts("reveal_result")]

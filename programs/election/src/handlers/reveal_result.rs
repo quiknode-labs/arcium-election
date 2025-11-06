@@ -29,16 +29,16 @@ pub fn reveal_result(
     id: u32,
 ) -> Result<()> {
     require!(
-        ctx.accounts.payer.key() == ctx.accounts.poll_acc.authority,
+        ctx.accounts.payer.key() == ctx.accounts.poll_account.authority,
         ErrorCode::InvalidAuthority
     );
 
     msg!("Revealing voting result for poll with id {}", id);
 
     let computation_args = vec![
-        Argument::PlaintextU128(ctx.accounts.poll_acc.nonce),
+        Argument::PlaintextU128(ctx.accounts.poll_account.nonce),
         Argument::Account(
-            ctx.accounts.poll_acc.key(),
+            ctx.accounts.poll_account.key(),
             // Offset calculation: discriminator + 1 byte (bump)
             (Poll::DISCRIMINATOR.len() + 1) as u32,
             32 * 3, // 3 encrypted vote counters (Neo robot, Humane AI PIN, friend.com), 32 bytes each

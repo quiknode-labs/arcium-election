@@ -35,12 +35,12 @@ pub fn create_poll(
     msg!("Creating a new poll");
 
     // Initialize the poll account with the provided parameters
-    ctx.accounts.poll_acc.question = question;
-    ctx.accounts.poll_acc.bump = ctx.bumps.poll_acc;
-    ctx.accounts.poll_acc.id = id;
-    ctx.accounts.poll_acc.authority = ctx.accounts.payer.key();
-    ctx.accounts.poll_acc.nonce = nonce;
-    ctx.accounts.poll_acc.vote_counts = [[0; 32]; 3];
+    ctx.accounts.poll_account.question = question;
+    ctx.accounts.poll_account.bump = ctx.bumps.poll_account;
+    ctx.accounts.poll_account.id = id;
+    ctx.accounts.poll_account.authority = ctx.accounts.payer.key();
+    ctx.accounts.poll_account.nonce = nonce;
+    ctx.accounts.poll_account.vote_counts = [[0; 32]; 3];
 
     let computation_args = vec![Argument::PlaintextU128(nonce)];
 
@@ -53,7 +53,7 @@ pub fn create_poll(
         computation_args,
         None,
         vec![CreatePollCallback::callback_ix(&[CallbackAccount {
-            pubkey: ctx.accounts.poll_acc.key(),
+            pubkey: ctx.accounts.poll_account.key(),
             is_writable: true,
         }])],
     )?;
@@ -70,8 +70,8 @@ pub fn create_poll_callback(
         _ => return Err(ErrorCode::AbortedComputation.into()),
     };
 
-    ctx.accounts.poll_acc.vote_counts = computation_result.ciphertexts;
-    ctx.accounts.poll_acc.nonce = computation_result.nonce;
+    ctx.accounts.poll_account.vote_counts = computation_result.ciphertexts;
+    ctx.accounts.poll_account.nonce = computation_result.nonce;
 
     Ok(())
 }

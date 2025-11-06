@@ -46,9 +46,9 @@ pub fn vote(
         Argument::ArcisPubkey(vote_encryption_pubkey),
         Argument::PlaintextU128(vote_nonce),
         Argument::EncryptedU8(choice),
-        Argument::PlaintextU128(ctx.accounts.poll_acc.nonce),
+        Argument::PlaintextU128(ctx.accounts.poll_account.nonce),
         Argument::Account(
-            ctx.accounts.poll_acc.key(),
+            ctx.accounts.poll_account.key(),
             // Offset calculation: discriminator + 1 byte (bump)
             (Poll::DISCRIMINATOR.len() + 1) as u32,
             32 * 3, // 3 vote counters (Neo robot, Humane AI PIN, friend.com), each stored as 32-byte ciphertext
@@ -63,7 +63,7 @@ pub fn vote(
         computation_args,
         None,
         vec![VoteCallback::callback_ix(&[CallbackAccount {
-            pubkey: ctx.accounts.poll_acc.key(),
+            pubkey: ctx.accounts.poll_account.key(),
             is_writable: true,
         }])],
     )?;
@@ -79,8 +79,8 @@ pub fn vote_callback(
         _ => return Err(ErrorCode::AbortedComputation.into()),
     };
 
-    ctx.accounts.poll_acc.vote_counts = vote_result.ciphertexts;
-    ctx.accounts.poll_acc.nonce = vote_result.nonce;
+    ctx.accounts.poll_account.vote_counts = vote_result.ciphertexts;
+    ctx.accounts.poll_account.nonce = vote_result.nonce;
 
     let clock = Clock::get()?;
     let current_timestamp = clock.unix_timestamp;
