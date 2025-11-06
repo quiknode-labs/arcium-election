@@ -8,10 +8,10 @@ mod circuits {
     /// Three voting options: 0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com
     pub type VoteCounts = [u64; 3];
 
-    /// Represents a single encrypted vote.
+    /// Represents a single encrypted choice.
     /// 0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com
-    pub struct UserVote {
-        vote: u8,
+    pub struct UserChoice {
+        choice: u8,
     }
 
     /// Initializes encrypted vote counters for a new poll.
@@ -27,28 +27,28 @@ mod circuits {
     /// Processes an encrypted vote and updates the running tallies.
     ///
     /// Takes an individual vote and adds it to the appropriate counter
-    /// without revealing the vote value. The updated vote statistics remain encrypted
+    /// without revealing the choice value. The updated vote statistics remain encrypted
     /// and can only be revealed by the poll authority.
     ///
     /// # Arguments
-    /// * `vote_ctx` - The encrypted vote to be counted (0, 1, or 2)
+    /// * `choice_ctx` - The encrypted choice to be counted (0, 1, or 2)
     /// * `vote_counts_ctx` - Current encrypted vote tallies
     ///
     /// # Returns
     /// Updated encrypted vote statistics with the new vote included
     #[instruction]
     pub fn vote(
-        vote_ctx: Enc<Shared, UserVote>,
+        choice_ctx: Enc<Shared, UserChoice>,
         vote_counts_ctx: Enc<Mxe, VoteCounts>,
     ) -> Enc<Mxe, VoteCounts> {
-        let user_vote = vote_ctx.to_arcis();
+        let user_choice = choice_ctx.to_arcis();
         let mut vote_counts = vote_counts_ctx.to_arcis();
 
-        // Increment appropriate counter based on vote value
+        // Increment appropriate counter based on choice value
         // Note: Must use explicit conditionals to avoid information leakage in encrypted circuits
-        if user_vote.vote == 0 {
+        if user_choice.choice == 0 {
             vote_counts[0] += 1;
-        } else if user_vote.vote == 1 {
+        } else if user_choice.choice == 1 {
             vote_counts[1] += 1;
         } else {
             vote_counts[2] += 1;
