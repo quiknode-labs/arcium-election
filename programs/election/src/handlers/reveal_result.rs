@@ -24,6 +24,7 @@ pub fn init_reveal_result_comp_def(ctx: Context<InitRevealResultCompDef>) -> Res
 /// # Arguments
 /// * `id` - The poll ID to reveal results for
 pub fn reveal_result(ctx: Context<RevealResult>, computation_offset: u64, id: u32) -> Result<()> {
+    // Only the poll authority can reveal the result
     require!(
         ctx.accounts.payer.key() == ctx.accounts.poll_account.authority,
         ErrorCode::InvalidAuthority
