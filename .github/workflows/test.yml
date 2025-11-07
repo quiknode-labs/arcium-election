@@ -15,5 +15,12 @@ jobs:
       - uses: arcium-hq/setup-arcium@v0.3.0
         with:
           runner-arch-os: x86_64_linux
-      - run: arcium build
+          # TODO: fix for outdated default Solaan CLI
+          # Remove once https://github.com/arcium-hq/setup-arcium/pull/2 is merged
+          solana-cli-version: 2.3.9
+      
+      - run: export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH" && solana --version
+        shell: bash
+
+      - run: export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH" && bash run-tests.bash
         shell: bash
