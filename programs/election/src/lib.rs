@@ -23,8 +23,8 @@ declare_id!("J7KTdhMTVhy7vtgyFSXi9SpptdTDmpg93pB53UdfuttF");
 pub mod election {
     use super::*;
 
-    pub fn create_poll_comp_def(ctx: Context<CreatePollCompDef>) -> Result<()> {
-        handlers::create_poll::create_poll_comp_def(ctx)
+    pub fn init_create_poll_comp_def(ctx: Context<CreatePollCompDef>) -> Result<()> {
+        handlers::create_poll::init_create_poll_comp_def(ctx)
     }
 
     pub fn create_poll(

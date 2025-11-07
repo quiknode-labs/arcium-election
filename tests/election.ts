@@ -59,7 +59,7 @@ describe("Election", () => {
     // deployment/test session. Re-initializing them in the same session would cause "account
     // already in use" errors since the accounts already exist onchain. This setup is separate
     // from test logic and only needs to happen once before running any tests.
-    await createPollCompDef(program, pollAuthority, false, false);
+    await initCreatePollCompDef(program, pollAuthority, false, false);
     await initVoteCompDef(program, pollAuthority, false, false);
     await initRevealResultCompDef(program, pollAuthority, false, false);
 
@@ -270,7 +270,7 @@ describe("Election", () => {
     assert.equal(revealEvent.output, expectedOutcome);
   });
 
-  const createPollCompDef = async (
+  const initCreatePollCompDef = async (
     program: Program<Election>,
     pollAuthority: anchor.web3.Keypair,
     uploadRawCircuit: boolean,
@@ -292,7 +292,7 @@ describe("Election", () => {
     // );
 
     const transactionSignature = await program.methods
-      .createPollCompDef()
+      .initCreatePollCompDef()
       .accounts({
         compDefAccount: compDefPDA,
         payer: pollAuthority.publicKey,

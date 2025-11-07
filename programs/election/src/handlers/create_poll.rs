@@ -10,7 +10,7 @@ use crate::{
 ///
 /// This initializes the onchain computation definition account that registers the encrypted
 /// instruction. Must be called once before using the `create_poll` encrypted instruction.
-pub fn create_poll_comp_def(ctx: Context<CreatePollCompDef>) -> Result<()> {
+pub fn init_create_poll_comp_def(ctx: Context<CreatePollCompDef>) -> Result<()> {
     init_comp_def(ctx.accounts, true, 0, None, None)?;
     Ok(())
 }
