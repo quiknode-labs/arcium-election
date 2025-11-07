@@ -69,11 +69,13 @@ describe("Election", () => {
 
     const pollComputationOffset = getRandomBigNumber();
 
+    const question = `Worst tech invention of 2025?`;
+
     const createPollSignature = await program.methods
       .createPoll(
         pollComputationOffset,
         pollId,
-        `Worst tech invention of 2025?`,
+        question,
         new anchor.BN(deserializeLE(pollNonce).toString())
       )
       .accountsPartial({
@@ -99,7 +101,7 @@ describe("Election", () => {
       program.programId,
       "confirmed"
     );
-    console.log(`🆕 Poll ID ${pollId} created`);
+    console.log(`🆕 Poll "${question}" with poll ID ${pollId} and choices ${OPTION_NAMES.join(", ")}`);
   });
 
   test("users can vote on polls without revealing their choices!", async () => {
@@ -109,9 +111,7 @@ describe("Election", () => {
     const carol = Keypair.generate();
 
     // Define votes for each user
-    // Alice votes NeoRobot, Bob votes NeoRobot, Carol votes HumaneAIPIN
-    // Expected: NeoRobot wins (2 votes)
-    const aliceChoice = VoteOption.NeoRobot;
+    const aliceChoice = VoteOption.HumaneAIPIN;
     const bobChoice = VoteOption.NeoRobot;
     const carolChoice = VoteOption.HumaneAIPIN;
 
@@ -161,7 +161,7 @@ describe("Election", () => {
     const bobCipher = new RescueCipher(bobKeys.sharedSecret);
     const carolCipher = new RescueCipher(carolKeys.sharedSecret);
 
-    console.log(`👬 Created wallets and encryption ciphers for Alice, Bob, and Carol`);
+    console.log(`👬 Created wallets and client side keys for Alice, Bob, and Carol`);
 
     // Helper function to cast a vote
     const castVote = async (
