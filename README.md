@@ -20,5 +20,6 @@ Run `bash run-tests.bash`. That will:
  - Remove the old test-ledger, so the old compdef accounts are cleared out
  - Run `arcium test` for you to build and run the tests.
 
+## Watch the Video
 
-[![Watch video](https://img.youtube.com/vi/f4QDICrVjpg/maxresdefault.jpg)](https://www.youtube.com/watch?v=f4QDICrVjpg)
+[![Private transactions on Solana with Arcium](https://img.youtube.com/vi/f4QDICrVjpg/maxresdefault.jpg)](https://www.youtube.com/watch?v=f4QDICrVjpg)
