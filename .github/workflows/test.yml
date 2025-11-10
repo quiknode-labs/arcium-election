@@ -15,7 +15,7 @@ jobs:
       - uses: arcium-hq/setup-arcium@v0.3.0
         with:
           runner-arch-os: x86_64_linux
-          # TODO: fix for outdated default Solaan CLI
+          # TODO: fix for outdated default Solana CLI
           # Remove once https://github.com/arcium-hq/setup-arcium/pull/2 is merged
           solana-cli-version: 2.3.9
       
