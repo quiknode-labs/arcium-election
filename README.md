@@ -1,4 +1,4 @@
-# Standalone Arcium Election Example
+# Private Elections on Solana with Arcium
 
 ![Tests](https://github.com/quiknode-labs/arcium-election/workflows/Test/badge.svg)
 
