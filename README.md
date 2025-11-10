@@ -2,7 +2,7 @@
 
 ![Tests](https://github.com/quiknode-labs/arcium-election/workflows/Test/badge.svg)
 
-Based on the https://github.com/arcium-hq/examples voting' app with a significant number of fixes (see [git history](https://github.com/quiknode-labs/arcium-election/commits/main/)), including fixes to race conditions, changing from one user voting on multiple polls to 3 users voting on a single poll, consisistent naming (between the comp def, handler, encrypted instruction handler and callback), and a simpler Anchor layout.
+Based on the https://github.com/arcium-hq/examples 'voting' app with a [significant number of fixes](https://github.com/quiknode-labs/arcium-election/commits/main/), including fixes to race conditions, changing from one user voting on multiple polls to 3 users voting on a single poll, consisistent naming (between the comp def, handler, encrypted instruction handler and callback), and a simpler Anchor layout.
 
 ## To Run
 
