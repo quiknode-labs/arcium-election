@@ -2,7 +2,7 @@
 
 ![Tests](https://github.com/quiknode-labs/arcium-election/workflows/Test/badge.svg)
 
-Based on the https://github.com/arcium-hq/examples 'voting' app with a [significant number of fixes](https://github.com/quiknode-labs/arcium-election/commits/main/), including fixes to race conditions, changing from one user voting on multiple polls to 3 users voting on a single poll, consisistent naming (between the comp def, handler, encrypted instruction handler and callback), and a simpler Anchor layout.
+Based on the https://github.com/arcium-hq/examples 'voting' app with a [significant number of fixes](https://github.com/quiknode-labs/arcium-election/commits/main/).
 
 ## To Run
 
@@ -22,4 +22,4 @@ Run `bash run-tests.bash`. That will:
 
 ## Watch the Video
 
-[![Private transactions on Solana with Arcium](https://img.youtube.com/vi/f4QDICrVjpg/maxresdefault.jpg)](https://www.youtube.com/watch?v=f4QDICrVjpg)
+[![Private transactions on Solana with Arcium](https://img.youtube.com/vi/X3Y6sL7A8O0/maxresdefault.jpg)](https://www.youtube.com/watch?v=X3Y6sL7A8O0)
