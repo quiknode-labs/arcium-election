@@ -20,7 +20,7 @@ Run `bash run-tests.bash`. That will:
  - Remove the old test-ledger, so the old compdef accounts are cleared out
  - Run `arcium test` for you to build and run the tests.
 
-## How the Election program works, and Arcium works
+## How the Election program works, and how Arcium works
 
 This is all explained beautifully in the video (see below), but also it's nice to have things written down:
 
