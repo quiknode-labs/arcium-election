@@ -10,7 +10,7 @@ Based on the https://github.com/arcium-hq/examples 'voting' app with a [signific
 - Use older Anchor 
 `avm use 0.31.1`
 - Use custom version of Rust Arcium wants:
-- `unset RUSTUP_TOOLCHAIN`
+`unset RUSTUP_TOOLCHAIN`
 
 - Get Docker https://docs.docker.com/desktop/setup/install/mac-install/
 - Start Docker desktop (`docker daemon not running`)
