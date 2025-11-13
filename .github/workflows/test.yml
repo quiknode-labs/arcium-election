@@ -2,9 +2,9 @@ name: Test
 
 on:
   push:
-    branches: [ main ]
+    branches: [main, next]
   pull_request:
-    branches: [ main ]
+    branches: [main, next]
 
 # From https://github.com/arcium-hq/setup-arcium
 jobs:
@@ -12,13 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      # Note this doesn't follow Arcium versions
       - uses: arcium-hq/setup-arcium@v0.3.0
         with:
           runner-arch-os: x86_64_linux
           # TODO: fix for outdated default Solana CLI
           # Remove once https://github.com/arcium-hq/setup-arcium/pull/2 is merged
-          solana-cli-version: 2.3.9
-      
+          solana-cli-version: 2.3.11
+          arcium-version: 0.4.0
+          anchor-version: 0.32.1
+
       - run: export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH" && solana --version
 
       - run: npm i

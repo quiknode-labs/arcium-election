@@ -12,7 +12,7 @@ use crate::{
 /// This initializes the onchain computation definition account that registers the encrypted
 /// instruction. Must be called once before using the `reveal_result` encrypted instruction.
 pub fn init_reveal_result_comp_def(ctx: Context<InitRevealResultCompDef>) -> Result<()> {
-    init_comp_def(ctx.accounts, true, 0, None, None)?;
+    init_comp_def(ctx.accounts, 0, None, None)?;
     Ok(())
 }
 
@@ -50,6 +50,7 @@ pub fn reveal_result(ctx: Context<RevealResult>, computation_offset: u64, id: u3
         computation_args,
         None,
         vec![RevealResultCallback::callback_ix(&[])],
+        1,
     )?;
     Ok(())
 }

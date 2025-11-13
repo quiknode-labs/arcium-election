@@ -13,7 +13,7 @@ use crate::{
 /// This initializes the onchain computation definition account that registers the encrypted
 /// instruction. Must be called once before using the `vote` encrypted instruction.
 pub fn init_vote_comp_def(ctx: Context<InitVoteCompDef>) -> Result<()> {
-    init_comp_def(ctx.accounts, true, 0, None, None)?;
+    init_comp_def(ctx.accounts, 0, None, None)?;
     Ok(())
 }
 
@@ -66,6 +66,7 @@ pub fn vote(
             pubkey: ctx.accounts.poll_account.key(),
             is_writable: true,
         }])],
+        1,
     )?;
     Ok(())
 }

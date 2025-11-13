@@ -17,7 +17,7 @@ use constants::*;
 pub use error::ErrorCode;
 pub use state::Poll;
 
-declare_id!("J7KTdhMTVhy7vtgyFSXi9SpptdTDmpg93pB53UdfuttF");
+declare_id!("26z6tf8ndLVRfQJJBvYsmtMyrLVWaBoUN6RgCXrtsZjD");
 
 #[arcium_program]
 pub mod election {
@@ -190,7 +190,7 @@ pub mod election {
 
         #[account(
             mut,
-            address = derive_cluster_pda!(mxe_account)
+            address = derive_cluster_pda!(mxe_account, ErrorCode::ClusterNotSet)
         )]
         pub cluster_account: Account<'info, Cluster>,
 
@@ -291,7 +291,7 @@ pub mod election {
 
         #[account(
             mut,
-            address = derive_cluster_pda!(mxe_account)
+            address = derive_cluster_pda!(mxe_account, ErrorCode::ClusterNotSet)
         )]
         pub cluster_account: Account<'info, Cluster>,
 
@@ -415,7 +415,7 @@ pub mod election {
 
         #[account(
             mut,
-            address = derive_cluster_pda!(mxe_account)
+            address = derive_cluster_pda!(mxe_account, ErrorCode::ClusterNotSet)
         )]
         pub cluster_account: Account<'info, Cluster>,
 
