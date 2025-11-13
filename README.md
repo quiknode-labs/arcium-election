@@ -7,14 +7,11 @@ Based on the https://github.com/arcium-hq/examples 'voting' app with a [signific
 ## To Run
 
 - Install Arcium
-
 - Use Arcium 0.4.0
-`arcup use 0.4.0`
-
+  `arcup use 0.4.0`
 - Use current Anchor
   `avm use 0.32.1`
-
-- Remove old pre-Anchor 0.32 hacks if set - use custom version of Rust Arcium wants:
+- Use custom version of Rust Arcium wants:
   `unset RUSTUP_TOOLCHAIN`
 
 - Get Docker https://docs.docker.com/desktop/setup/install/mac-install/

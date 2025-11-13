@@ -17,7 +17,7 @@ use constants::*;
 pub use error::ErrorCode;
 pub use state::Poll;
 
-declare_id!("26z6tf8ndLVRfQJJBvYsmtMyrLVWaBoUN6RgCXrtsZjD");
+declare_id!("28sDdkSz9WxFwLZEDx93ifLBVhti5NSkP6ZpgG7Z3H2m");
 
 #[arcium_program]
 pub mod election {
