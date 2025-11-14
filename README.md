@@ -1,6 +1,6 @@
 # Private Elections on Solana with Arcium
 
-![Tests](https://github.com/quiknode-labs/arcium-election/workflows/Test/badge.svg)
+![Tests](https://github.com/quiknode-labs/arcium-election/actions/workflows/test.yml/badge.svg?branch=main)
 
 Based on the https://github.com/arcium-hq/examples 'voting' app with a [significant number of fixes](https://github.com/quiknode-labs/arcium-election/commits/main/).
 
