@@ -6,9 +6,13 @@ Based on the https://github.com/arcium-hq/examples 'voting' app with a [signific
 
 ## To Run
 
-- Install Arcium (this tutorial is build for Arcium 0.3.0, 0.4.0 is not yet recommended)
+- Use Arcium 0.3.0 (this tutorial is build for Arcium 0.3.0, 0.4.0 is not yet recommended)
+
+`arcup use 0.3.0`
+
 - Use older Anchor 
 `avm use 0.31.1`
+
 - Use custom version of Rust Arcium wants:
 `unset RUSTUP_TOOLCHAIN`
 
