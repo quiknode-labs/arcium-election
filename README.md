@@ -6,22 +6,25 @@ Based on the https://github.com/arcium-hq/examples 'voting' app with a [signific
 
 ## To Run
 
-- Use Arcium 0.3.0 (this tutorial is build for Arcium 0.3.0, 0.4.0 is not yet recommended)
-`arcup use 0.3.0`
+- Install Arcium
 
-- Use older Anchor 
-`avm use 0.31.1`
+- Use Arcium 0.4.0
+`arcup use 0.4.0`
 
-- Use custom version of Rust Arcium wants:
-`unset RUSTUP_TOOLCHAIN`
+- Use current Anchor
+  `avm use 0.32.1`
+
+- Remove old pre-Anchor 0.32 hacks if set - use custom version of Rust Arcium wants:
+  `unset RUSTUP_TOOLCHAIN`
 
 - Get Docker https://docs.docker.com/desktop/setup/install/mac-install/
+
 - Start Docker desktop (`docker daemon not running`)
 
 Run `bash run-tests.bash`. That will:
 
- - Remove the old test-ledger, so the old compdef accounts are cleared out
- - Run `arcium test` for you to build and run the tests.
+- Remove the old test-ledger, so the old compdef accounts are cleared out
+- Run `arcium test` for you to build and run the tests.
 
 ## How the Election program works, and how Arcium works
 
@@ -45,7 +48,7 @@ This is all explained beautifully in the video (see below), but also it's nice t
 
 - Only the poll authority can call `reveal_result` (`programs/election/src/handlers/reveal_result.rs`) to decrypt and reveal the vote tallies. The handler uses `queue_computation` to invoke...
 - `reveal_result` (`encrypted-ixs/src/lib.rs`) which decrypts the `vote_counts`, compares all three vote counts, and returns the winning option (0, 1, or 2), which will be received by...
-- `reveal_result_callback` (`programs/election/src/handlers/reveal_result.rs`) which emits a `RevealResultEvent` with the winning option. We could instead save the winning option to a PDA, log it, or do whatever else we want. 
+- `reveal_result_callback` (`programs/election/src/handlers/reveal_result.rs`) which emits a `RevealResultEvent` with the winning option. We could instead save the winning option to a PDA, log it, or do whatever else we want.
 
 ### Oh and by the way
 

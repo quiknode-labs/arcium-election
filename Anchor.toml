@@ -1,12 +1,14 @@
 [toolchain]
-package_manager = "yarn"
+# No need to install and use a third party package manager like yarn
+package_manager = "npm"
+anchor_version = "0.32.1"
 
 [features]
 resolution = true
 skip-lint = false
 
 [programs.localnet]
-election = "J7KTdhMTVhy7vtgyFSXi9SpptdTDmpg93pB53UdfuttF"
+election = "26z6tf8ndLVRfQJJBvYsmtMyrLVWaBoUN6RgCXrtsZjD"
 
 [registry]
 url = "https://api.apr.dev"

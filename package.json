@@ -5,8 +5,8 @@
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
   },
   "dependencies": {
-    "@arcium-hq/client": "0.3.0",
-    "@coral-xyz/anchor": "^0.31.1",
+    "@arcium-hq/client": "^0.4.0",
+    "@coral-xyz/anchor": "^0.32.1",
     "@solana-developers/helpers": "^2.3.0",
     "tsx": "^4.20.6"
   },
