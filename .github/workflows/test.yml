@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      # Install system dependencies for hidapi (needed on GitHub Actions environment)
+      - name: Install libudev
+        run: sudo apt-get update && sudo apt-get install -y libudev-dev
       # Note this doesn't follow Arcium versions
       - uses: arcium-hq/setup-arcium@v0.3.0
         with:
