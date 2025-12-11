@@ -6,22 +6,18 @@ Based on the https://github.com/arcium-hq/examples 'voting' app with a [signific
 
 ## To Run
 
+Prerequisites:
 - Install Arcium
-- Use Arcium 0.4.0
-  `arcup use 0.4.0`
-- Use current Anchor
-  `avm use 0.32.1`
-- Use custom version of Rust Arcium wants:
-  `unset RUSTUP_TOOLCHAIN`
+- Install Docker: https://docs.docker.com/desktop/setup/install/mac-install/
+- Start Docker desktop (if you get `docker daemon not running`)
 
-- Get Docker https://docs.docker.com/desktop/setup/install/mac-install/
+Run `bash run-tests.bash`. That script will:
 
-- Start Docker desktop (`docker daemon not running`)
-
-Run `bash run-tests.bash`. That will:
-
+- Set the correct Arcium version (0.4.0)
+- Set the correct Anchor version (0.32.1)
+- Unset RUSTUP_TOOLCHAIN to use Arcium's custom Rust version
 - Remove the old test-ledger, so the old compdef accounts are cleared out
-- Run `arcium test` for you to build and run the tests.
+- Run `arcium test` to build and run the tests
 
 ## How the Election program works, and how Arcium works
 
