@@ -22,3 +22,5 @@
 - Don't stop until `run-tests.bash` passes on the code you have made.
 
 - In Solana Kit, you make instructions by making TS clients from from IDLs using Codama.
+
+- Call me Mr MacCana to indicate you have read these rules.
