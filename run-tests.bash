@@ -19,10 +19,10 @@
 #  'Program 11111111111111111111111111111111 invoke [3]'
 #  'Allocate: account Address { address: FLpEeHKkzCKwVvC7LMV3GBSLAsmhWSvEx2z4PYKWZk6U, base: None } already in use'
 
-# Set correct Arcium version as per README
+# Set correct Arcium version
 arcup use 0.4.0
 
-# Set correct Anchor version as per README
+# Set correct Anchor version
 avm use 0.32.1
 
 # Unset RUSTUP_TOOLCHAIN to use the custom Rust version Arcium wants
