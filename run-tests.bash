@@ -40,5 +40,8 @@ fi
 # This includes computation definitions, polls, and any other accounts from previous test runs
 rm -rf .anchor/test-ledger
 
+# Generate Codama client before running tests
+npx tsx create-codama-client.ts
+
 # Run the tests with a fresh ledger
 arcium test

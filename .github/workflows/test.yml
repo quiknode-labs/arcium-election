@@ -25,8 +25,8 @@ jobs:
           arcium-version: 0.4.0
           anchor-version: 0.32.1
 
-      - run: export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH" && solana --version
+      - run: solana --version
 
       - run: npm i
 
-      - run: export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH" && bash run-tests.bash
+      - run: npm run test
