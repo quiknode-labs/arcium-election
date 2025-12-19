@@ -43,7 +43,15 @@ fi
 rm -rf .anchor/test-ledger
 
 # Generate Codama client before running tests
+# Build the program first to generate target/idl/*.json
+# The Codama client generator needs this IDL to exist
+arcium build
+
+# Generate Codama client from the IDL
+# This must happen after build (so IDL exists) but before test (so test can import from dist/election-client)
 npx tsx create-codama-client.ts
 
-# Run the tests with a fresh ledger
+# Run tests
+# Note: arcium test will rebuild (yes, twice) but it also sets up all artifacts and localnet properly
+# The double build is necessary because we need the IDL for Codama generation before testing
 arcium test
