@@ -22,8 +22,10 @@
 # Set correct Arcium version
 arcup use 0.4.0
 
-# Set correct Anchor version
-avm use 0.32.1
+# Set correct Anchor version (only if avm is available)
+if command -v avm &> /dev/null; then
+  avm use 0.32.1
+fi
 
 # Unset RUSTUP_TOOLCHAIN to use the custom Rust version Arcium wants
 unset RUSTUP_TOOLCHAIN
