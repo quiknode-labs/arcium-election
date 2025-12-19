@@ -38,14 +38,13 @@ import {
   getVoteInstructionAsync,
   getRevealResultInstructionAsync,
 } from "../dist/election-client/index.js";
-import * as fs from "fs/promises";
 import * as path from "path";
+import idl from "../target/idl/election.json" with { type: "json" };
 
 describe("Election", () => {
-  // Election program ID from target/idl/election.json
-  const ELECTION_PROGRAM_ID = address(
-    "28sDdkSz9WxFwLZEDx93ifLBVhti5NSkP6ZpgG7Z3H2m"
-  );
+  // Election program ID - read from IDL to support dynamic program IDs across environments
+  // Arcium generates different program IDs per environment, so we read the actual deployed ID
+  const ELECTION_PROGRAM_ID = address(idl.address);
 
   // Solana Kit connection for transaction sending
   let connection: Connection;
