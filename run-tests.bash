@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 # Fixed 'account already in use' errors by killing the validator and removing the test ledger
 
 # This script ensures a clean test environment by removing any persisted onchain state.
