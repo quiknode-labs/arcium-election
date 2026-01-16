@@ -8,7 +8,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-election = "26z6tf8ndLVRfQJJBvYsmtMyrLVWaBoUN6RgCXrtsZjD"
+election = "3XogG8seGS5mUe8SwJk37xb3g3d55hpFf4df43pgn3pJ"
 
 [registry]
 url = "https://api.apr.dev"
@@ -19,3 +19,10 @@ wallet = "~/.config/solana/id.json"
 
 [scripts]
 test = "npx tsx tests/election.ts"
+
+[test]
+# GitHub Actions environment can be very slow - 300s (5 minutes) allows Solana localnet
+# and Arcium MPC nodes enough time to initialize. Local development typically uses ~90s.
+startup_wait = 300000
+shutdown_wait = 2000
+upgradeable = false

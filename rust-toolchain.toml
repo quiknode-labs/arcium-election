@@ -1,4 +1,9 @@
 [toolchain]
-channel = "1.89.0"
+# IMPORTANT: Arcium 0.6.2 requires Rust 1.88.0+ due to:
+# - arcis-interpreter 0.6.2 uses proc_macro_span (stabilized in 1.88.0)
+# - zmij 1.0.2 (transitive dep via serde_json) uses select_unpredictable (stabilized in 1.88.0)
+# Both features were stabilized in Rust 1.88.0, so no workarounds are needed.
+# See ARCIUM_UPGRADE_NOTES.md for full details and rationale.
+channel = "1.92.0"
 components = ["rustfmt","clippy"]
 profile = "minimal"

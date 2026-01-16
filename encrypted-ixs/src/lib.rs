@@ -1,8 +1,8 @@
-use arcis_imports::*;
+use arcis::*;
 
 #[encrypted]
 mod circuits {
-    use arcis_imports::*;
+    use arcis::*;
 
     /// Tracks the encrypted vote tallies for a poll.
     /// Three voting options: 0 = Neo robot, 1 = Humane AI PIN, 2 = friend.com
@@ -78,7 +78,7 @@ mod circuits {
         let count2 = vote_counts[2].reveal();
 
         // Find the maximum count using chained .max() calls.
-        // Note: Arcis only supports `use arcis_imports::*`, so std imports like
+        // Note: Arcis only supports `use arcis::*`, so std imports like
         // `use std::cmp;` are not available. Chaining .max() is the idiomatic
         // Rust approach for finding the max of 3+ values when std::cmp::max
         // or iterator methods are unavailable.

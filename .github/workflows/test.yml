@@ -12,21 +12,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      # Install system dependencies for hidapi (needed on GitHub Actions environment)
-      - name: Install libudev
-        run: sudo apt-get update && sudo apt-get install -y libudev-dev
-      # Note this doesn't follow Arcium versions
-      - uses: arcium-hq/setup-arcium@v0.3.0
-        with:
-          runner-arch-os: x86_64_linux
-          # TODO: fix for outdated default Solana CLI
-          # Remove once https://github.com/arcium-hq/setup-arcium/pull/2 is merged
-          solana-cli-version: 2.3.11
-          arcium-version: 0.4.0
-          anchor-version: 0.32.1
 
-      - run: export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH" && solana --version
+      # Use setup-arcium@v0.5.4 to install Rust, Solana, Anchor, and arcup
+      # Then override with Arcium 0.6.2 binary since arcup 0.6.2 has bootstrap bug
+      - uses: arcium-hq/setup-arcium@v0.5.4
+        with:
+          runner-arch-os: "x86_64_linux"
+          arcium-version: "0.5.4"
+          solana-cli-version: "2.3.11"
+          anchor-version: "0.32.1"
+          node-version: "22.12.0"
+
+      # Override with Arcium 0.6.2 binary
+      # arcup 0.6.2 has bootstrap bug (panics with "index not found" at arcup/src/config.rs:29:51)
+      # so we download the 0.6.2 binary directly instead of using arcup
+      - name: Override with Arcium CLI 0.6.2
+        run: |
+          curl "https://bin.arcium.com/download/arcium_x86_64_linux_0.6.2" -o ~/.cargo/bin/arcium
+          chmod +x ~/.cargo/bin/arcium
+          arcium --version
+
+      # Verify Docker is running and can pull images
+      # Arcium requires Docker to run MPC nodes during tests
+      - name: Verify Docker
+        run: |
+          docker info
+          docker ps
 
       - run: npm i
 
-      - run: export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH" && bash run-tests.bash
+      - run: npm test
