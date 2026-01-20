@@ -1,5 +1,6 @@
 import { getSetComputeUnitLimitInstruction } from "@solana-program/compute-budget";
 import { randomBytes } from "crypto";
+import { promises as fs } from "fs";
 import { connect, type Connection } from "solana-kite";
 import {
   type KeyPairSigner,
@@ -10,26 +11,25 @@ import {
 } from "@solana/kit";
 import { RescueCipher } from "./arcium-solana-kit/rescue-cipher.js";
 import {
-  getArciumEnv,
-  getMXEAccAddress,
-  getMempoolAccAddress,
-  getCompDefAccAddress,
-  getExecutingPoolAccAddress,
-  getComputationAccAddress,
+  getArciumClusterOffset,
+  getMXEAccountAddress,
+  getMempoolAccountAddress,
+  getComputationDefinitionAccountAddress,
+  getExecutingPoolAccountAddress,
+  getComputationAccountAddress,
+  getClusterAccountAddress,
   awaitComputationFinalization,
-  getCompDefAccOffset,
+  getComputationDefinitionAccountOffset,
   deserializeLE,
   buildFinalizeCompDefInstruction,
-} from "./arcium-solana-kit/arcium-kit-helpers.js";
+} from "./arcium-solana-kit/helpers.js";
 import * as os from "os";
 import { describe, test, before } from "node:test";
-import assert from "node:assert";
 import {
   getRandomBigInt,
   makeClientSideKeys,
 } from "./arcium-solana-kit/helpers.js";
-import { loadWalletFromFileWithSecretKey } from "./solana-kit-helpers.js";
-import { uploadCircuit } from "./arcium-solana-kit/arcium-upload-circuit.js";
+import { uploadCircuit } from "./arcium-solana-kit/upload-circuit.js";
 import {
   getInitVoteCompDefInstruction,
   getInitRevealResultCompDefInstruction,
@@ -49,7 +49,7 @@ describe("Election", () => {
   // Solana Kit connection for transaction sending
   let connection: Connection;
 
-  const arciumEnv = getArciumEnv();
+  const arciumClusterOffset = getArciumClusterOffset();
 
   // The Poll ID we're going to create
   const pollId = 420;
@@ -77,7 +77,7 @@ describe("Election", () => {
     // Initialize Solana Kit connection
     connection = connect("localnet");
 
-    pollAuthority = await loadWalletFromFileWithSecretKey(
+    pollAuthority = await connection.loadWalletFromFile(
       `${os.homedir()}/.config/solana/id.json`
     );
 
@@ -100,25 +100,28 @@ describe("Election", () => {
 
     const createPollInstruction = await getCreatePollInstructionAsync({
       payer: pollAuthority,
-      computationAccount: await getComputationAccAddress(
+      computationAccount: await getComputationAccountAddress(
         connection,
-        ELECTION_PROGRAM_ID,
+        arciumClusterOffset,
         pollComputationOffset
       ),
-      clusterAccount: arciumEnv.arciumClusterPubkey,
-      mxeAccount: await getMXEAccAddress(connection, ELECTION_PROGRAM_ID),
-      mempoolAccount: await getMempoolAccAddress(
+      clusterAccount: await getClusterAccountAddress(
         connection,
-        ELECTION_PROGRAM_ID
+        arciumClusterOffset
       ),
-      executingPool: await getExecutingPoolAccAddress(
+      mxeAccount: await getMXEAccountAddress(connection, ELECTION_PROGRAM_ID),
+      mempoolAccount: await getMempoolAccountAddress(
         connection,
-        ELECTION_PROGRAM_ID
+        arciumClusterOffset
       ),
-      compDefAccount: await getCompDefAccAddress(
+      executingPool: await getExecutingPoolAccountAddress(
+        connection,
+        arciumClusterOffset
+      ),
+      compDefAccount: await getComputationDefinitionAccountAddress(
         connection,
         ELECTION_PROGRAM_ID,
-        getCompDefAccOffset("create_poll")
+        getComputationDefinitionAccountOffset("create_poll")
       ),
       computationOffset: pollComputationOffset,
       id: pollId,
@@ -204,25 +207,28 @@ describe("Election", () => {
 
       const voteInstruction = await getVoteInstructionAsync({
         payer: voter,
-        computationAccount: await getComputationAccAddress(
+        computationAccount: await getComputationAccountAddress(
           connection,
-          ELECTION_PROGRAM_ID,
+          arciumClusterOffset,
           voteComputationOffset
         ),
-        clusterAccount: arciumEnv.arciumClusterPubkey,
-        mxeAccount: await getMXEAccAddress(connection, ELECTION_PROGRAM_ID),
-        mempoolAccount: await getMempoolAccAddress(
+        clusterAccount: await getClusterAccountAddress(
           connection,
-          ELECTION_PROGRAM_ID
+          arciumClusterOffset
         ),
-        executingPool: await getExecutingPoolAccAddress(
+        mxeAccount: await getMXEAccountAddress(connection, ELECTION_PROGRAM_ID),
+        mempoolAccount: await getMempoolAccountAddress(
           connection,
-          ELECTION_PROGRAM_ID
+          arciumClusterOffset
         ),
-        compDefAccount: await getCompDefAccAddress(
+        executingPool: await getExecutingPoolAccountAddress(
+          connection,
+          arciumClusterOffset
+        ),
+        compDefAccount: await getComputationDefinitionAccountAddress(
           connection,
           ELECTION_PROGRAM_ID,
-          getCompDefAccOffset("vote")
+          getComputationDefinitionAccountOffset("vote")
         ),
         authority: pollAuthority.address,
         computationOffset: voteComputationOffset,
@@ -280,25 +286,28 @@ describe("Election", () => {
 
     const revealResultInstruction = await getRevealResultInstructionAsync({
       payer: pollAuthority,
-      computationAccount: await getComputationAccAddress(
+      computationAccount: await getComputationAccountAddress(
         connection,
-        ELECTION_PROGRAM_ID,
+        arciumClusterOffset,
         revealComputationOffset
       ),
-      clusterAccount: arciumEnv.arciumClusterPubkey,
-      mxeAccount: await getMXEAccAddress(connection, ELECTION_PROGRAM_ID),
-      mempoolAccount: await getMempoolAccAddress(
+      clusterAccount: await getClusterAccountAddress(
         connection,
-        ELECTION_PROGRAM_ID
+        arciumClusterOffset
       ),
-      executingPool: await getExecutingPoolAccAddress(
+      mxeAccount: await getMXEAccountAddress(connection, ELECTION_PROGRAM_ID),
+      mempoolAccount: await getMempoolAccountAddress(
         connection,
-        ELECTION_PROGRAM_ID
+        arciumClusterOffset
       ),
-      compDefAccount: await getCompDefAccAddress(
+      executingPool: await getExecutingPoolAccountAddress(
+        connection,
+        arciumClusterOffset
+      ),
+      compDefAccount: await getComputationDefinitionAccountAddress(
         connection,
         ELECTION_PROGRAM_ID,
-        getCompDefAccOffset("reveal_result")
+        getComputationDefinitionAccountOffset("reveal_result")
       ),
       computationOffset: revealComputationOffset,
       id: pollId,
@@ -352,8 +361,8 @@ describe("Election", () => {
     displayName: string,
     needsComputeBudget: boolean = false
   ): Promise<string> => {
-    const offset = getCompDefAccOffset(circuitName);
-    const compDefPDA = await getCompDefAccAddress(
+    const offset = getComputationDefinitionAccountOffset(circuitName);
+    const compDefPDA = await getComputationDefinitionAccountAddress(
       connection,
       ELECTION_PROGRAM_ID,
       offset
@@ -373,11 +382,11 @@ describe("Election", () => {
     } else {
       const initInstruction = getInitInstruction({
         payer: pollAuthority,
-        mxeAccount: await getMXEAccAddress(connection, ELECTION_PROGRAM_ID),
+        mxeAccount: await getMXEAccountAddress(connection, ELECTION_PROGRAM_ID),
         compDefAccount: compDefPDA,
       });
 
-      const instructions = [];
+      const instructions: Array<Instruction> = [];
 
       if (needsComputeBudget) {
         // create_poll circuit requires higher compute budget due to initialization complexity

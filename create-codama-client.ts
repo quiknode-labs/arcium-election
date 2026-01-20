@@ -1,6 +1,6 @@
 import { createFromRoot } from "codama";
 import { rootNodeFromAnchor } from "@codama/nodes-from-anchor";
-import { renderJavaScriptVisitor } from "@codama/renderers";
+import { renderVisitor } from "@codama/renderers-js";
 import path from "path";
 import { promises as fs } from "fs";
 
@@ -37,6 +37,6 @@ const idl = await loadAnchorIDL();
 const codama = createFromRoot(rootNodeFromAnchor(idl));
 
 const generatedPath = path.join("dist", "election-client");
-codama.accept(renderJavaScriptVisitor(generatedPath));
+codama.accept(renderVisitor(generatedPath));
 
 console.log(`✅ Codama client generated at ${generatedPath}`);

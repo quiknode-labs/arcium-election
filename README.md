@@ -2,22 +2,39 @@
 
 ![Tests](https://github.com/quiknode-labs/arcium-election/actions/workflows/test.yml/badge.svg?branch=main)
 
-Based on the https://github.com/arcium-hq/examples 'voting' app with a [significant number of fixes](https://github.com/quiknode-labs/arcium-election/commits/main/).
+Based on the https://github.com/arcium-hq/examples 'voting' app with a significant number of fixes:
+
+## Main Changes from Upstream
+
+- Replaced legacy web3.js with Solana Kit
+- Fixed race conditions in tests
+- Improved CI/CD with GitHub Actions
+- Better error handling and validation
+- Consistent naming conventions throughout (poll authority, choice, vote_counts). Avoid re-using the word 'vote' in multiple contexts.
+- Program ID is now read from IDL instead of hardcoded
+- Comprehensive test coverage with multiple users
+- Build and dependency management improvements
+- Better documentation and code comments
+
+## Watch the Video
+
+[![Private transactions on Solana with Arcium](https://img.youtube.com/vi/X3Y6sL7A8O0/maxresdefault.jpg)](https://www.youtube.com/watch?v=X3Y6sL7A8O0)
 
 ## To Run
 
 Prerequisites:
+
 - Install Arcium
 - Install Docker: https://docs.docker.com/desktop/setup/install/mac-install/
-- Start Docker desktop (if you get `docker daemon not running`)
+- Start Docker desktop app (if you get `docker daemon not running` you haven't started Docker desktop app)
 
-Run `bash run-tests.bash`. That script will:
+Run `npm test`. That script will:
 
-- Set the correct Arcium version (0.4.0)
-- Set the correct Anchor version (0.32.1)
-- Unset RUSTUP_TOOLCHAIN to use Arcium's custom Rust version
-- Remove the old test-ledger, so the old compdef accounts are cleared out
-- Run `arcium test` to build and run the tests
+- Set the correct Anchor version (0.32.1) if avm is available
+- Unset RUSTUP_TOOLCHAIN to use Rust 1.92.0 (from rust-toolchain.toml)
+- Kill any running Solana validator and remove test ledger for clean state
+- Build the program and generate Codama client
+- Run `arcium test` to test with Arcium 0.6.3
 
 ## How the Election program works, and how Arcium works
 
@@ -47,6 +64,3 @@ This is all explained beautifully in the video (see below), but also it's nice t
 
 Since we have 3 encrypted instruction handlers in `encrypted-ixs/src/lib.rs`, we have 3 matching Solana instruction handlers to deploy the compiled code to Solana PDAs - these are called `init_create_poll_comp_def`, `init_vote_comp_def`, and `init_reveal_result_comp_def`. These are called once when deploying our program, see the `before` hook in `tests/election.ts`.
 
-## Watch the Video
-
-[![Private transactions on Solana with Arcium](https://img.youtube.com/vi/X3Y6sL7A8O0/maxresdefault.jpg)](https://www.youtube.com/watch?v=X3Y6sL7A8O0)

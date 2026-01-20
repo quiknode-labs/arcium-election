@@ -17,7 +17,7 @@ use constants::*;
 pub use error::ErrorCode;
 pub use state::Poll;
 
-declare_id!("28sDdkSz9WxFwLZEDx93ifLBVhti5NSkP6ZpgG7Z3H2m");
+declare_id!("3XogG8seGS5mUe8SwJk37xb3g3d55hpFf4df43pgn3pJ");
 
 #[arcium_program]
 pub mod election {
@@ -40,7 +40,7 @@ pub mod election {
     #[arcium_callback(encrypted_ix = "create_poll")]
     pub fn create_poll_callback(
         ctx: Context<CreatePollCallback>,
-        output: ComputationOutputs<CreatePollOutput>,
+        output: SignedComputationOutputs<CreatePollOutput>,
     ) -> Result<()> {
         handlers::create_poll::create_poll_callback(ctx, output)
     }
@@ -71,7 +71,7 @@ pub mod election {
     #[arcium_callback(encrypted_ix = "vote")]
     pub fn vote_callback(
         ctx: Context<VoteCallback>,
-        output: ComputationOutputs<VoteOutput>,
+        output: SignedComputationOutputs<VoteOutput>,
     ) -> Result<()> {
         handlers::vote::vote_callback(ctx, output)
     }
@@ -91,7 +91,7 @@ pub mod election {
     #[arcium_callback(encrypted_ix = "reveal_result")]
     pub fn reveal_result_callback(
         ctx: Context<RevealResultCallback>,
-        output: ComputationOutputs<RevealResultOutput>,
+        output: SignedComputationOutputs<RevealResultOutput>,
     ) -> Result<()> {
         handlers::reveal_result::reveal_result_callback(ctx, output)
     }
@@ -135,6 +135,15 @@ pub mod election {
         /// CHECK: instructions_sysvar, checked by the account constraint
         pub instructions_sysvar: AccountInfo<'info>,
 
+        #[account(address = derive_mxe_pda!())]
+        pub mxe_account: Account<'info, MXEAccount>,
+
+        /// CHECK: computation_account, passed to verify_output for BLS signature verification
+        pub computation_account: UncheckedAccount<'info>,
+
+        #[account(address = derive_cluster_pda!(mxe_account, ErrorCode::ClusterNotSet))]
+        pub cluster_account: Account<'info, Cluster>,
+
         /// CHECK: poll_account, checked by the callback account key passed in queue_computation
         #[account(mut)]
         pub poll_account: Account<'info, Poll>,
@@ -155,7 +164,7 @@ pub mod election {
             bump,
             address = derive_sign_pda!(),
         )]
-        pub sign_pda_account: Account<'info, SignerAccount>,
+        pub sign_pda_account: Account<'info, ArciumSignerAccount>,
 
         #[account(
             address = derive_mxe_pda!()
@@ -164,21 +173,21 @@ pub mod election {
 
         #[account(
             mut,
-            address = derive_mempool_pda!()
+            address = derive_mempool_pda!(mxe_account, ErrorCode::ClusterNotSet)
         )]
         /// CHECK: mempool_account, checked by the arcium program
         pub mempool_account: UncheckedAccount<'info>,
 
         #[account(
             mut,
-            address = derive_execpool_pda!()
+            address = derive_execpool_pda!(mxe_account, ErrorCode::ClusterNotSet)
         )]
         /// CHECK: executing_pool, checked by the arcium program
         pub executing_pool: UncheckedAccount<'info>,
 
         #[account(
             mut,
-            address = derive_comp_pda!(computation_offset)
+            address = derive_comp_pda!(computation_offset, mxe_account, ErrorCode::ClusterNotSet)
         )]
         /// CHECK: computation_account, checked by the arcium program.
         pub computation_account: UncheckedAccount<'info>,
@@ -201,6 +210,7 @@ pub mod election {
         pub pool_account: Account<'info, FeePool>,
 
         #[account(
+            mut,
             address = ARCIUM_CLOCK_ACCOUNT_ADDRESS,
         )]
         pub clock_account: Account<'info, ClockAccount>,
@@ -256,30 +266,30 @@ pub mod election {
             bump,
             address = derive_sign_pda!(),
         )]
-        pub sign_pda_account: Account<'info, SignerAccount>,
+        pub sign_pda_account: Account<'info, ArciumSignerAccount>,
 
         #[account(
             address = derive_mxe_pda!()
         )]
-        pub mxe_account: Account<'info, MXEAccount>,
+        pub mxe_account: Box<Account<'info, MXEAccount>>,
 
         #[account(
             mut,
-            address = derive_mempool_pda!()
+            address = derive_mempool_pda!(mxe_account, ErrorCode::ClusterNotSet)
         )]
         /// CHECK: mempool_account, checked by the arcium program
         pub mempool_account: UncheckedAccount<'info>,
 
         #[account(
             mut,
-            address = derive_execpool_pda!()
+            address = derive_execpool_pda!(mxe_account, ErrorCode::ClusterNotSet)
         )]
         /// CHECK: executing_pool, checked by the arcium program
         pub executing_pool: UncheckedAccount<'info>,
 
         #[account(
             mut,
-            address = derive_comp_pda!(computation_offset)
+            address = derive_comp_pda!(computation_offset, mxe_account, ErrorCode::ClusterNotSet)
         )]
         /// CHECK: computation_account, checked by the arcium program.
         pub computation_account: UncheckedAccount<'info>,
@@ -287,13 +297,13 @@ pub mod election {
         #[account(
             address = derive_comp_def_pda!(COMP_DEF_OFFSET_VOTE)
         )]
-        pub comp_def_account: Account<'info, ComputationDefinitionAccount>,
+        pub comp_def_account: Box<Account<'info, ComputationDefinitionAccount>>,
 
         #[account(
             mut,
             address = derive_cluster_pda!(mxe_account, ErrorCode::ClusterNotSet)
         )]
-        pub cluster_account: Account<'info, Cluster>,
+        pub cluster_account: Box<Account<'info, Cluster>>,
 
         #[account(
             mut,
@@ -302,6 +312,7 @@ pub mod election {
         pub pool_account: Account<'info, FeePool>,
 
         #[account(
+            mut,
             address = ARCIUM_CLOCK_ACCOUNT_ADDRESS,
         )]
         pub clock_account: Account<'info, ClockAccount>,
@@ -338,6 +349,15 @@ pub mod election {
         #[account(address = ::anchor_lang::solana_program::sysvar::instructions::ID)]
         /// CHECK: instructions_sysvar, checked by the account constraint
         pub instructions_sysvar: AccountInfo<'info>,
+
+        #[account(address = derive_mxe_pda!())]
+        pub mxe_account: Account<'info, MXEAccount>,
+
+        /// CHECK: computation_account, passed to verify_output for BLS signature verification
+        pub computation_account: UncheckedAccount<'info>,
+
+        #[account(address = derive_cluster_pda!(mxe_account, ErrorCode::ClusterNotSet))]
+        pub cluster_account: Account<'info, Cluster>,
 
         #[account(mut)]
         pub poll_account: Account<'info, Poll>,
@@ -380,7 +400,7 @@ pub mod election {
             bump,
             address = derive_sign_pda!(),
         )]
-        pub sign_pda_account: Account<'info, SignerAccount>,
+        pub sign_pda_account: Account<'info, ArciumSignerAccount>,
 
         #[account(
             address = derive_mxe_pda!()
@@ -389,21 +409,21 @@ pub mod election {
 
         #[account(
             mut,
-            address = derive_mempool_pda!()
+            address = derive_mempool_pda!(mxe_account, ErrorCode::ClusterNotSet)
         )]
         /// CHECK: mempool_account, checked by the arcium program
         pub mempool_account: UncheckedAccount<'info>,
 
         #[account(
             mut,
-            address = derive_execpool_pda!()
+            address = derive_execpool_pda!(mxe_account, ErrorCode::ClusterNotSet)
         )]
         /// CHECK: executing_pool, checked by the arcium program
         pub executing_pool: UncheckedAccount<'info>,
 
         #[account(
             mut,
-            address = derive_comp_pda!(computation_offset)
+            address = derive_comp_pda!(computation_offset, mxe_account, ErrorCode::ClusterNotSet)
         )]
         /// CHECK: computation_account, checked by the arcium program.
         pub computation_account: UncheckedAccount<'info>,
@@ -426,6 +446,7 @@ pub mod election {
         pub pool_account: Account<'info, FeePool>,
 
         #[account(
+            mut,
             address = ARCIUM_CLOCK_ACCOUNT_ADDRESS,
         )]
         pub clock_account: Account<'info, ClockAccount>,
@@ -454,11 +475,20 @@ pub mod election {
         #[account(address = ::anchor_lang::solana_program::sysvar::instructions::ID)]
         /// CHECK: instructions_sysvar, checked by the account constraint
         pub instructions_sysvar: AccountInfo<'info>,
+
+        #[account(address = derive_mxe_pda!())]
+        pub mxe_account: Account<'info, MXEAccount>,
+
+        /// CHECK: computation_account, passed to verify_output for BLS signature verification
+        pub computation_account: UncheckedAccount<'info>,
+
+        #[account(address = derive_cluster_pda!(mxe_account, ErrorCode::ClusterNotSet))]
+        pub cluster_account: Account<'info, Cluster>,
     }
 }
 
-pub use election::{
-    CreatePoll, CreatePollCallback, CreatePollCompDef, CreatePollOutput, InitRevealResultCompDef,
-    InitVoteCompDef, RevealResult, RevealResultCallback, RevealResultOutput, Vote, VoteCallback,
-    VoteOutput,
+pub use crate::election::{
+    CreatePoll, CreatePollCallback,
+    InitVoteCompDef, Vote, VoteCallback,
+    InitRevealResultCompDef, RevealResult, RevealResultCallback,
 };

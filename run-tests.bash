@@ -20,15 +20,24 @@ set -euo pipefail
 #  'Program 11111111111111111111111111111111 invoke [3]'
 #  'Allocate: account Address { address: FLpEeHKkzCKwVvC7LMV3GBSLAsmhWSvEx2z4PYKWZk6U, base: None } already in use'
 
-# Set correct Arcium version
-arcup use 0.4.0
+# Set Arcium version for local development
+if command -v arcup &> /dev/null; then
+  arcup use 0.6.3
+fi
+
+# TODO: Upgrade to Agave 3.x when resolved
+# Currently using Agave 2.3.11 due to Agave 3.x panic with bind-address 0.0.0.0
+# See: https://solana.stackexchange.com/questions/23807/anchor-localnet-wont-start-local-validator-panicked-  at-unspecifiedipaddr
+# Agave 3.x throws: UnspecifiedIpAddr(0.0.0.0) panic when Arcium tries to bind validator to 0.0.0.0
 
 # Set correct Anchor version (only if avm is available)
 if command -v avm &> /dev/null; then
   avm use 0.32.1
 fi
 
-# Unset RUSTUP_TOOLCHAIN to use the custom Rust version Arcium wants
+# Unset RUSTUP_TOOLCHAIN to use the Rust version from rust-toolchain.toml (1.92.0)
+# This environment variable overrides rust-toolchain.toml, so we must unset it
+# to ensure we use stable Rust 1.92.0 which has select_unpredictable stabilized
 unset RUSTUP_TOOLCHAIN
 
 # Kill any running validator process and wait for it to terminate

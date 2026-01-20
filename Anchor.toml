@@ -8,7 +8,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-election = "28sDdkSz9WxFwLZEDx93ifLBVhti5NSkP6ZpgG7Z3H2m"
+election = "3XogG8seGS5mUe8SwJk37xb3g3d55hpFf4df43pgn3pJ"
 
 [registry]
 url = "https://api.apr.dev"
@@ -19,3 +19,9 @@ wallet = "~/.config/solana/id.json"
 
 [scripts]
 test = "npx tsx tests/election.ts"
+
+[test]
+# Arcium 0.6.3 requires extra startup time to load 50+ genesis accounts,
+# the Arcium program, Lighthouse program, and wait for Docker containers
+# (trusted-dealer, arx-nodes) to come online. Default timeout is too short.
+startup_wait = 300000

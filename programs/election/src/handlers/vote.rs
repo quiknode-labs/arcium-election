@@ -3,9 +3,8 @@ use arcium_anchor::prelude::*;
 use arcium_client::idl::arcium::types::CallbackAccount;
 
 use crate::{
-    error::ErrorCode,
     state::{Poll, VoteEvent},
-    InitVoteCompDef, Vote, VoteCallback, VoteOutput,
+    election::{InitVoteCompDef, Vote, VoteCallback, VoteOutput},
 };
 
 /// One-off job to create computation definition for `vote` in encrypted-ixs/src/lib.rs.
@@ -13,7 +12,7 @@ use crate::{
 /// This initializes the onchain computation definition account that registers the encrypted
 /// instruction. Must be called once before using the `vote` encrypted instruction.
 pub fn init_vote_comp_def(ctx: Context<InitVoteCompDef>) -> Result<()> {
-    init_comp_def(ctx.accounts, 0, None, None)?;
+    init_comp_def(ctx.accounts, None, None)?;
     Ok(())
 }
 
@@ -42,18 +41,18 @@ pub fn vote(
     vote_encryption_pubkey: [u8; 32],
     vote_nonce: u128,
 ) -> Result<()> {
-    let computation_args = vec![
-        Argument::ArcisPubkey(vote_encryption_pubkey),
-        Argument::PlaintextU128(vote_nonce),
-        Argument::EncryptedU8(choice),
-        Argument::PlaintextU128(ctx.accounts.poll_account.nonce),
-        Argument::Account(
+    let computation_args = ArgBuilder::new()
+        .x25519_pubkey(vote_encryption_pubkey)
+        .plaintext_u128(vote_nonce)
+        .encrypted_u8(choice)
+        .plaintext_u128(ctx.accounts.poll_account.nonce)
+        .account(
             ctx.accounts.poll_account.key(),
             // Offset calculation: discriminator + 1 byte (bump)
             (Poll::DISCRIMINATOR.len() + 1) as u32,
             32 * 3, // 3 vote counters (Neo robot, Humane AI PIN, friend.com), each stored as 32-byte ciphertext
-        ),
-    ];
+        )
+        .build();
 
     ctx.accounts.sign_pda_account.bump = ctx.bumps.sign_pda_account;
 
@@ -62,23 +61,28 @@ pub fn vote(
         computation_offset,
         computation_args,
         None,
-        vec![VoteCallback::callback_ix(&[CallbackAccount {
-            pubkey: ctx.accounts.poll_account.key(),
-            is_writable: true,
-        }])],
+        vec![VoteCallback::callback_ix(
+            computation_offset,
+            &ctx.accounts.mxe_account,
+            &[CallbackAccount {
+                pubkey: ctx.accounts.poll_account.key(),
+                is_writable: true,
+            }]
+        )?],
         1,
+        0,
     )?;
     Ok(())
 }
 
 pub fn vote_callback(
     ctx: Context<VoteCallback>,
-    output: ComputationOutputs<VoteOutput>,
+    output: SignedComputationOutputs<VoteOutput>,
 ) -> Result<()> {
-    let vote_result = match output {
-        ComputationOutputs::Success(VoteOutput { field_0 }) => field_0,
-        _ => return Err(ErrorCode::AbortedComputation.into()),
-    };
+    let VoteOutput { field_0: vote_result } = output.verify_output(
+        &ctx.accounts.cluster_account,
+        &ctx.accounts.computation_account
+    )?;
 
     ctx.accounts.poll_account.vote_counts = vote_result.ciphertexts;
     ctx.accounts.poll_account.nonce = vote_result.nonce;

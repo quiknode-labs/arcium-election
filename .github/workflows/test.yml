@@ -9,24 +9,63 @@ on:
 # From https://github.com/arcium-hq/setup-arcium
 jobs:
   run-arcium-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v3
-      # Install system dependencies for hidapi (needed on GitHub Actions environment)
-      - name: Install libudev
-        run: sudo apt-get update && sudo apt-get install -y libudev-dev
-      # Note this doesn't follow Arcium versions
-      - uses: arcium-hq/setup-arcium@v0.3.0
-        with:
-          runner-arch-os: x86_64_linux
-          # TODO: fix for outdated default Solana CLI
-          # Remove once https://github.com/arcium-hq/setup-arcium/pull/2 is merged
-          solana-cli-version: 2.3.11
-          arcium-version: 0.4.0
-          anchor-version: 0.32.1
 
-      - run: solana --version
+      - uses: arcium-hq/setup-arcium@v0.6.3
+        with:
+          runner-arch-os: "x86_64_linux"
 
       - run: npm i
 
-      - run: npm run test
+      - name: Debug - System state before test
+        run: |
+          echo "=== Docker status ==="
+          docker ps -a
+          docker info
+          echo "=== System resources ==="
+          df -h
+          free -h
+          echo "=== Solana version ==="
+          solana --version
+          echo "=== Arcium version ==="
+          arcium --version
+          echo "=== Anchor version ==="
+          anchor --version
+
+      - name: Run tests with debug
+        run: |
+          echo "=== Starting test at $(date -u +"%Y-%m-%dT%H:%M:%SZ") ==="
+          rm -rf /tmp/computation_folder_0
+          rm -rf /tmp/computation_folder_1
+          rm -rf /tmp/computation_folder_2
+          rm -rf /tmp/vault
+          mkdir /tmp/vault
+          mkdir /tmp/computation_folder_0
+          mkdir /tmp/computation_folder_1
+          mkdir /tmp/computation_folder_2
+          sudo prlimit --pid $$ --nofile=1048576:1048576
+          timeout 10m npm test || EXIT_CODE=$?
+          echo "=== Test completed at $(date -u +"%Y-%m-%dT%H:%M:%SZ") ==="
+          if [ -n "$EXIT_CODE" ]; then
+            exit $EXIT_CODE
+          fi
+
+      - name: Debug - Logs if test fails
+        if: failure()
+        run: |
+          echo "=== Docker container logs ==="
+          docker ps -a
+          for container in $(docker ps -aq); do
+            echo "--- Container $container logs ---"
+            docker logs $container 2>&1 || echo "Could not get logs for $container"
+          done
+          echo "=== Solana validator logs (if exists) ==="
+          if [ -f test-ledger/validator.log ]; then
+            tail -100 test-ledger/validator.log
+          else
+            echo "No test-ledger/validator.log found"
+          fi
+          echo "=== Recent system messages ==="
+          dmesg | tail -50 || echo "Cannot access dmesg"

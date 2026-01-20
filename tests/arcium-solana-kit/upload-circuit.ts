@@ -2,27 +2,23 @@ import { type Address, type KeyPairSigner, type Instruction, AccountRole, addres
 import { type Connection } from "solana-kite";
 import bs58 from "bs58";
 import {
-  getArciumProgAddress,
-  getCompDefAccAddress,
-  getCompDefAccOffset,
-  getCompDefRawAddress,
+  getComputationDefinitionAccountAddress,
+  getComputationDefinitionAccountOffset,
+  getComputationDefinitionRawAddress,
   buildFinalizeCompDefInstruction,
-} from "./arcium-kit-helpers.js";
+  MAX_UPLOAD_PER_TX_BYTES,
+  MAX_REALLOC_PER_IX,
+  MAX_ACCOUNT_SIZE,
+  MAX_EMBIGGEN_IX_PER_TX,
+} from "./helpers.js";
+import { ARCIUM_PROGRAM_ID } from "./constants.js";
 
 /**
  * Upload circuit implementation using Solana Kit.
  * Re-implementation of @arcium-hq/client's uploadCircuit without Anchor/web3.js.
  */
 
-// Arcium program ID
-const ARCIUM_PROGRAM_ID = address("Bv3Fb9VjzjWGfX18QTUcVycAfeLoQ5zZN6vv2g3cTZxp");
 const SYSTEM_PROGRAM_ID = address("11111111111111111111111111111111");
-
-// Upload circuit constants from Arcium client
-const MAX_REALLOC_PER_IX = 10240;
-const MAX_UPLOAD_PER_TX_BYTES = 814;
-const MAX_ACCOUNT_SIZE = 10485760;
-const MAX_EMBIGGEN_IX_PER_TX = 18;
 
 /**
  * Builds an init_raw_circuit_acc instruction.
@@ -66,8 +62,8 @@ export const buildInitRawCircuitAccInstruction = async (
   instructionData.set(indexBytes, discriminator.length + offsetBytes.length + mxeProgramBytes.length);
 
   // Derive PDAs
-  const compDefAcc = await getCompDefAccAddress(connection, mxeProgramId, new Uint8Array(offsetBytes));
-  const compDefRaw = await getCompDefRawAddress(connection, compDefAcc, rawCircuitIndex);
+  const compDefAcc = await getComputationDefinitionAccountAddress(connection, mxeProgramId, new Uint8Array(offsetBytes));
+  const compDefRaw = await getComputationDefinitionRawAddress(connection, compDefAcc, rawCircuitIndex);
 
   // Return Solana Kit Instruction
   return {
@@ -123,8 +119,8 @@ export const buildEmbiggenRawCircuitAccInstruction = async (
   instructionData.set(indexBytes, discriminator.length + offsetBytes.length + mxeProgramBytes.length);
 
   // Derive PDAs
-  const compDefAcc = await getCompDefAccAddress(connection, mxeProgramId, new Uint8Array(offsetBytes));
-  const compDefRaw = await getCompDefRawAddress(connection, compDefAcc, rawCircuitIndex);
+  const compDefAcc = await getComputationDefinitionAccountAddress(connection, mxeProgramId, new Uint8Array(offsetBytes));
+  const compDefRaw = await getComputationDefinitionRawAddress(connection, compDefAcc, rawCircuitIndex);
 
   // Return Solana Kit Instruction
   return {
@@ -209,8 +205,8 @@ export const buildUploadCircuitInstruction = async (
   instructionData.set(offsetBytes, pos);
 
   // Derive PDAs
-  const compDefAcc = await getCompDefAccAddress(connection, mxeProgramId, new Uint8Array(compOffsetBytes));
-  const compDefRaw = await getCompDefRawAddress(connection, compDefAcc, rawCircuitIndex);
+  const compDefAcc = await getComputationDefinitionAccountAddress(connection, mxeProgramId, new Uint8Array(compOffsetBytes));
+  const compDefRaw = await getComputationDefinitionRawAddress(connection, compDefAcc, rawCircuitIndex);
 
   // Return Solana Kit Instruction
   return {
@@ -406,7 +402,7 @@ export const uploadCircuit = async (
   const numAccs = Math.ceil(rawCircuit.length / (MAX_ACCOUNT_SIZE - 9));
 
   // Get computation definition offset from circuit name
-  const compDefOffsetBytes = getCompDefAccOffset(circuitName);
+  const compDefOffsetBytes = getComputationDefinitionAccountOffset(circuitName);
   const compDefOffset = Buffer.from(compDefOffsetBytes).readUInt32LE(0);
 
   if (logging) {

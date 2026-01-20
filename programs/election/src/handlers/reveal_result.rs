@@ -4,7 +4,7 @@ use arcium_anchor::prelude::*;
 use crate::{
     error::ErrorCode,
     state::{Poll, RevealResultEvent},
-    InitRevealResultCompDef, RevealResult, RevealResultCallback, RevealResultOutput,
+    election::{InitRevealResultCompDef, RevealResult, RevealResultCallback, RevealResultOutput},
 };
 
 /// One-off job to create computation definition for `reveal_result` in encrypted-ixs/src/lib.rs.
@@ -12,7 +12,7 @@ use crate::{
 /// This initializes the onchain computation definition account that registers the encrypted
 /// instruction. Must be called once before using the `reveal_result` encrypted instruction.
 pub fn init_reveal_result_comp_def(ctx: Context<InitRevealResultCompDef>) -> Result<()> {
-    init_comp_def(ctx.accounts, 0, None, None)?;
+    init_comp_def(ctx.accounts, None, None)?;
     Ok(())
 }
 
@@ -32,15 +32,15 @@ pub fn reveal_result(ctx: Context<RevealResult>, computation_offset: u64, id: u3
 
     msg!("Revealing voting result for poll with id {}", id);
 
-    let computation_args = vec![
-        Argument::PlaintextU128(ctx.accounts.poll_account.nonce),
-        Argument::Account(
+    let computation_args = ArgBuilder::new()
+        .plaintext_u128(ctx.accounts.poll_account.nonce)
+        .account(
             ctx.accounts.poll_account.key(),
             // Offset calculation: discriminator + 1 byte (bump)
             (Poll::DISCRIMINATOR.len() + 1) as u32,
             32 * 3, // 3 encrypted vote counters (Neo robot, Humane AI PIN, friend.com), 32 bytes each
-        ),
-    ];
+        )
+        .build();
 
     ctx.accounts.sign_pda_account.bump = ctx.bumps.sign_pda_account;
 
@@ -49,20 +49,25 @@ pub fn reveal_result(ctx: Context<RevealResult>, computation_offset: u64, id: u3
         computation_offset,
         computation_args,
         None,
-        vec![RevealResultCallback::callback_ix(&[])],
+        vec![RevealResultCallback::callback_ix(
+            computation_offset,
+            &ctx.accounts.mxe_account,
+            &[]
+        )?],
         1,
+        0,
     )?;
     Ok(())
 }
 
 pub fn reveal_result_callback(
-    _ctx: Context<RevealResultCallback>,
-    output: ComputationOutputs<RevealResultOutput>,
+    ctx: Context<RevealResultCallback>,
+    output: SignedComputationOutputs<RevealResultOutput>,
 ) -> Result<()> {
-    let winner = match output {
-        ComputationOutputs::Success(RevealResultOutput { field_0 }) => field_0,
-        _ => return Err(ErrorCode::AbortedComputation.into()),
-    };
+    let RevealResultOutput { field_0: winner } = output.verify_output(
+        &ctx.accounts.cluster_account,
+        &ctx.accounts.computation_account
+    )?;
 
     emit!(RevealResultEvent { output: winner });
 

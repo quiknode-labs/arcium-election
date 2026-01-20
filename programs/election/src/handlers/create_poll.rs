@@ -2,16 +2,14 @@ use anchor_lang::prelude::*;
 use arcium_anchor::prelude::*;
 use arcium_client::idl::arcium::types::CallbackAccount;
 
-use crate::{
-    error::ErrorCode, CreatePoll, CreatePollCallback, CreatePollCompDef, CreatePollOutput,
-};
+use crate::election::{CreatePoll, CreatePollCallback, CreatePollCompDef, CreatePollOutput};
 
 /// One-off job to create computation definition for `create_poll` in encrypted-ixs/src/lib.rs.
 ///
 /// This initializes the onchain computation definition account that registers the encrypted
 /// instruction. Must be called once before using the `create_poll` encrypted instruction.
 pub fn init_create_poll_comp_def(ctx: Context<CreatePollCompDef>) -> Result<()> {
-    init_comp_def(ctx.accounts, 0, None, None)?;
+    init_comp_def(ctx.accounts, None, None)?;
     Ok(())
 }
 
@@ -42,7 +40,9 @@ pub fn create_poll(
     ctx.accounts.poll_account.nonce = nonce;
     ctx.accounts.poll_account.vote_counts = [[0; 32]; 3];
 
-    let computation_args = vec![Argument::PlaintextU128(nonce)];
+    let computation_args = ArgBuilder::new()
+        .plaintext_u128(nonce)
+        .build();
 
     ctx.accounts.sign_pda_account.bump = ctx.bumps.sign_pda_account;
 
@@ -52,11 +52,16 @@ pub fn create_poll(
         computation_offset,
         computation_args,
         None,
-        vec![CreatePollCallback::callback_ix(&[CallbackAccount {
-            pubkey: ctx.accounts.poll_account.key(),
-            is_writable: true,
-        }])],
+        vec![CreatePollCallback::callback_ix(
+            computation_offset,
+            &ctx.accounts.mxe_account,
+            &[CallbackAccount {
+                pubkey: ctx.accounts.poll_account.key(),
+                is_writable: true,
+            }]
+        )?],
         1,
+        0,
     )?;
 
     Ok(())
@@ -64,12 +69,12 @@ pub fn create_poll(
 
 pub fn create_poll_callback(
     ctx: Context<CreatePollCallback>,
-    output: ComputationOutputs<CreatePollOutput>,
+    output: SignedComputationOutputs<CreatePollOutput>,
 ) -> Result<()> {
-    let computation_result = match output {
-        ComputationOutputs::Success(CreatePollOutput { field_0 }) => field_0,
-        _ => return Err(ErrorCode::AbortedComputation.into()),
-    };
+    let CreatePollOutput { field_0: computation_result } = output.verify_output(
+        &ctx.accounts.cluster_account,
+        &ctx.accounts.computation_account
+    )?;
 
     ctx.accounts.poll_account.vote_counts = computation_result.ciphertexts;
     ctx.accounts.poll_account.nonce = computation_result.nonce;
