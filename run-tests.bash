@@ -59,7 +59,7 @@ arcium build
 
 # Generate Codama client from the IDL
 # This must happen after build (so IDL exists) but before test (so test can import from dist/election-client)
-npx tsx create-codama-client.ts
+npx create-codama-clients
 
 # Run tests
 # Note: arcium test will rebuild (yes, twice) but it also sets up all artifacts and localnet properly
