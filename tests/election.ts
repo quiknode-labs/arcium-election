@@ -23,6 +23,7 @@ import {
   deserializeLE,
   buildFinalizeCompDefInstruction,
 } from "./arcium-solana-kit/helpers.js";
+import { awaitRevealResult } from "./arcium-solana-kit/event-listener.js";
 import * as os from "os";
 import { describe, test, before } from "node:test";
 import {
@@ -331,8 +332,6 @@ describe("Election", () => {
         expectedOutcome
       )}"`
     );
-    // Note: We can't verify the actual result without event listening, but the test will fail
-    // if the computation doesn't complete successfully
   });
 
   /**
