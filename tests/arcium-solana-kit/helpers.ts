@@ -105,7 +105,21 @@ export const getMXELutAccountAddress = async (
 ): Promise<Address> => {
   // The LUT account address is loaded from artifacts/mxe_lut_acc.json as a genesis account
   // It's owned by the AddressLookupTable program, not derived as a PDA
-  return "7tYnP9JHWdZhsC1vPWpMiVCGu6StRFJJvLuN71GUFYYe" as Address;
+  // We read it from the artifact file since it changes between environments
+  const artifactPath = join(currentDir, "..", "..", "artifacts", "mxe_lut_acc.json");
+
+  try {
+    const artifactContent = await readFile(artifactPath, "utf-8");
+    const artifact = JSON.parse(artifactContent);
+    return artifact.pubkey as Address;
+  } catch (error) {
+    // If the artifact file doesn't exist yet, throw an error with a helpful message
+    throw new Error(
+      `Failed to read MXE LUT account from ${artifactPath}. ` +
+      `Ensure Arcium nodes have been initialized and genesis accounts created. ` +
+      `Original error: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
 };
 
 /**
