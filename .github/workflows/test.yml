@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: arcium-hq/setup-arcium@v0.6.3
+      - uses: arcium-hq/setup-arcium@v0.6.6
         with:
           runner-arch-os: "x86_64_linux"
 

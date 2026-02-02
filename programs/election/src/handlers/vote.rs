@@ -60,7 +60,6 @@ pub fn vote(
         ctx.accounts,
         computation_offset,
         computation_args,
-        None,
         vec![VoteCallback::callback_ix(
             computation_offset,
             &ctx.accounts.mxe_account,

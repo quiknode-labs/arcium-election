@@ -22,6 +22,8 @@ import {
   getComputationDefinitionAccountOffset,
   deserializeLE,
   buildFinalizeCompDefInstruction,
+  getMXELutAccountAddress,
+  getLutProgramAddress,
 } from "./arcium-solana-kit/helpers.js";
 import { awaitRevealResult } from "./arcium-solana-kit/event-listener.js";
 import * as os from "os";
@@ -356,6 +358,8 @@ describe("Election", () => {
       payer: KeyPairSigner;
       mxeAccount: Address;
       compDefAccount: Address;
+      addressLookupTable: Address;
+      lutProgram: Address;
     }) => Instruction,
     displayName: string,
     needsComputeBudget: boolean = false
@@ -383,6 +387,8 @@ describe("Election", () => {
         payer: pollAuthority,
         mxeAccount: await getMXEAccountAddress(connection, ELECTION_PROGRAM_ID),
         compDefAccount: compDefPDA,
+        addressLookupTable: await getMXELutAccountAddress(connection, ELECTION_PROGRAM_ID),
+        lutProgram: getLutProgramAddress(),
       });
 
       const instructions: Array<Instruction> = [];

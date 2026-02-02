@@ -22,7 +22,7 @@ set -euo pipefail
 
 # Set Arcium version for local development
 if command -v arcup &> /dev/null; then
-  arcup use 0.6.3
+  arcup use 0.6.6
 fi
 
 # TODO: Upgrade to Agave 3.x when resolved

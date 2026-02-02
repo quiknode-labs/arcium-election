@@ -34,7 +34,7 @@ Run `npm test`. That script will:
 - Unset RUSTUP_TOOLCHAIN to use Rust 1.92.0 (from rust-toolchain.toml)
 - Kill any running Solana validator and remove test ledger for clean state
 - Build the program and generate Codama client
-- Run `arcium test` to test with Arcium 0.6.3
+- Run `arcium test` to test with Arcium 0.6.6
 
 ## How the Election program works, and how Arcium works
 

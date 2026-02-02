@@ -48,7 +48,6 @@ pub fn reveal_result(ctx: Context<RevealResult>, computation_offset: u64, id: u3
         ctx.accounts,
         computation_offset,
         computation_args,
-        None,
         vec![RevealResultCallback::callback_ix(
             computation_offset,
             &ctx.accounts.mxe_account,

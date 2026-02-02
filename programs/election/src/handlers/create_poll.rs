@@ -51,7 +51,6 @@ pub fn create_poll(
         ctx.accounts,
         computation_offset,
         computation_args,
-        None,
         vec![CreatePollCallback::callback_ix(
             computation_offset,
             &ctx.accounts.mxe_account,

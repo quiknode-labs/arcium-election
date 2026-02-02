@@ -17,7 +17,7 @@ use constants::*;
 pub use error::ErrorCode;
 pub use state::Poll;
 
-declare_id!("3XogG8seGS5mUe8SwJk37xb3g3d55hpFf4df43pgn3pJ");
+declare_id!("EmzBbFz57z4S47eca95vPxSLFeotx4tTXmNK8cDd1sBJ");
 
 #[arcium_program]
 pub mod election {
@@ -115,6 +115,13 @@ pub mod election {
         /// CHECK: comp_def_account, checked by arcium program.
         /// Can't check it here as it's not initialized yet.
         pub comp_def_account: UncheckedAccount<'info>,
+
+        #[account(mut)]
+        /// CHECK: address_lookup_table, checked by arcium program
+        pub address_lookup_table: UncheckedAccount<'info>,
+
+        /// CHECK: lut_program, checked by arcium program
+        pub lut_program: UncheckedAccount<'info>,
 
         pub arcium_program: Program<'info, Arcium>,
 
@@ -245,6 +252,13 @@ pub mod election {
         /// CHECK: comp_def_account, checked by arcium program.
         /// Can't check it here as it's not initialized yet.
         pub comp_def_account: UncheckedAccount<'info>,
+
+        #[account(mut)]
+        /// CHECK: address_lookup_table, checked by arcium program
+        pub address_lookup_table: UncheckedAccount<'info>,
+
+        /// CHECK: lut_program, checked by arcium program
+        pub lut_program: UncheckedAccount<'info>,
 
         pub arcium_program: Program<'info, Arcium>,
 
@@ -379,6 +393,13 @@ pub mod election {
         /// CHECK: comp_def_account, checked by arcium program.
         /// Can't check it here as it's not initialized yet.
         pub comp_def_account: UncheckedAccount<'info>,
+
+        #[account(mut)]
+        /// CHECK: address_lookup_table, checked by arcium program
+        pub address_lookup_table: UncheckedAccount<'info>,
+
+        /// CHECK: lut_program, checked by arcium program
+        pub lut_program: UncheckedAccount<'info>,
 
         pub arcium_program: Program<'info, Arcium>,
 

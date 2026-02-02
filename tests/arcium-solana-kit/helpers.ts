@@ -22,11 +22,13 @@ const arciumIdl = JSON.parse(await readFile(arciumIdlPath, "utf-8"));
 /**
  * All Arcium helper functions for working with Solana Kit.
  * Re-implementation of @arcium-hq/client without web3.js dependency.
- * Updated for Arcium 0.6.3
+ * Updated for Arcium 0.6.6
  */
 
 const MEMPOOL_SEED = "Mempool";
 const EXECUTING_POOL_SEED = "Execpool";
+const LUT_SEED = "Lut";
+const ADDRESS_LOOKUP_TABLE_PROGRAM_ID = "AddressLookupTab1e1111111111111111111111111" as Address;
 
 /**
  * Arcium transaction constants extracted from the Arcium IDL.
@@ -86,6 +88,34 @@ export const getMXEAccountAddress = async (
     programId,
   ]);
   return result.pda;
+};
+
+/**
+ * Gets the MXE Lookup Table (LUT) account address.
+ * The LUT account stores address mappings for transaction optimization.
+ * This is loaded from the genesis accounts and owned by the AddressLookupTable program.
+ *
+ * @param connection - The Kite connection
+ * @param programId - The MXE program ID
+ * @returns The MXE LUT account address
+ */
+export const getMXELutAccountAddress = async (
+  connection: Connection,
+  programId: Address
+): Promise<Address> => {
+  // The LUT account address is loaded from artifacts/mxe_lut_acc.json as a genesis account
+  // It's owned by the AddressLookupTable program, not derived as a PDA
+  return "7tYnP9JHWdZhsC1vPWpMiVCGu6StRFJJvLuN71GUFYYe" as Address;
+};
+
+/**
+ * Returns the Solana Address Lookup Table program ID.
+ * This is a constant program address used by Solana for address lookup tables.
+ *
+ * @returns The AddressLookupTable program address
+ */
+export const getLutProgramAddress = (): Address => {
+  return ADDRESS_LOOKUP_TABLE_PROGRAM_ID;
 };
 
 /**
@@ -503,12 +533,12 @@ export const awaitComputationFinalization = async (
  * Re-implementation of @arcium-hq/client's buildFinalizeCompDefTx without Anchor.
  *
  * This function creates a Solana Kit instruction for the finalize_computation_definition
- * instruction from the Arcium IDL. The instruction structure from IDL (0.6.3):
+ * instruction from the Arcium IDL. The instruction structure from IDL (0.6.6):
  * - Discriminator: [174, 66, 159, 51, 199, 243, 219, 38]
  * - Args: comp_offset (u32), mxe_program (pubkey)
  * - Accounts: signer (writable, signer), comp_def_acc (writable, PDA), comp_def_raw (PDA)
  *
- * Breaking change in 0.6.3: Added comp_def_raw as third account (PDA at index 0)
+ * Breaking change in 0.6.6: Added comp_def_raw as third account (PDA at index 0)
  *
  * @param connection - The Kite connection
  * @param signer - The signer KeyPairSigner
