@@ -44,15 +44,9 @@ mod circuits {
         let user_choice = choice_ctx.to_arcis();
         let mut vote_counts = vote_counts_ctx.to_arcis();
 
-        // Increment appropriate counter based on choice value
-        // Note: Must use explicit conditionals to avoid information leakage in encrypted circuits
-        if user_choice.choice == 0 {
-            vote_counts[0] += 1;
-        } else if user_choice.choice == 1 {
-            vote_counts[1] += 1;
-        } else {
-            vote_counts[2] += 1;
-        }
+        // "Arcis automatically converts secret-indexed array access to oblivious operations."
+        // https://docs.arcium.com/developers/arcis/operations
+        vote_counts[user_choice.choice as usize] += 1;
 
         vote_counts_ctx.owner.from_arcis(vote_counts)
     }
