@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: arcium-hq/setup-arcium@v0.6.6
+      - uses: arcium-hq/setup-arcium@v0.8.0
         with:
           runner-arch-os: "x86_64_linux"
 
@@ -46,6 +46,8 @@ jobs:
           mkdir /tmp/computation_folder_1
           mkdir /tmp/computation_folder_2
           sudo prlimit --pid $$ --nofile=1048576:1048576
+          # Tests take ~2.5 minutes on Mac (M-series). 10-minute timeout provides
+          # safety margin for slower CI runners, Docker startup variance, and build caching.
           timeout 10m npm test || EXIT_CODE=$?
           echo "=== Test completed at $(date -u +"%Y-%m-%dT%H:%M:%SZ") ==="
           if [ -n "$EXIT_CODE" ]; then

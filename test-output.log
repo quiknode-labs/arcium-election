@@ -1,0 +1,660 @@
+
+> test
+> bash run-tests.bash
+
+Tagging arcium/arx-node:v0.8.0 as latest...
+Tagging arcium/trusted-dealer:v0.8.0 as latest...
+Successfully switched to version 0.8.0:
+  CLI:                0.8.0
+  ARX Node:           arcium/arx-node:v0.8.0 -> latest
+  Trusted Dealer:     arcium/trusted-dealer:v0.8.0 -> latest
+Now using anchor version 0.32.1.
+Syncing program keys... (use --skip-keys-sync to skip)
+Removed artifacts/operator_acc_recovery_peer_2.json
+Removed artifacts/mxe_key_recovery_init_comp.json
+Removed artifacts/arx_node_79xa_CmR7.json
+Removed artifacts/arx_ata_DoTn_V1iV.json
+Removed artifacts/wallet_acc_DoTn_V1iV.json
+Removed artifacts/arx_ata_recovery_peer_3.json
+Removed artifacts/wallet_acc_callback_46HV_Nwqu.json
+Removed artifacts/arx_node_recovery_peer_1.json
+Removed artifacts/wallet_acc_callback_recovery_peer_0.json
+Removed artifacts/arcium_clock.json
+Removed artifacts/wallet_acc_recovery_peer_1.json
+Removed artifacts/wallet_acc_recovery_peer_0.json
+Removed artifacts/wallet_acc_callback_recovery_peer_1.json
+Removed artifacts/vote_raw_circuit_0.json
+Removed artifacts/arx_node_recovery_peer_0.json
+Removed artifacts/arcium_fee_pool.json
+Removed artifacts/mxe_lut_acc.json
+Removed artifacts/operator_acc_Ec3U_GGCN.json
+Removed artifacts/arx_ata_recovery_peer_2.json
+Removed artifacts/create_poll_raw_circuit_0.json
+Removed artifacts/mxe_keygen_comp.json
+Removed artifacts/operator_acc_recovery_peer_3.json
+Removed artifacts/operator_acc_recovery_peer_4.json
+Removed artifacts/wallet_acc_callback_2Y7B_aTz2.json
+Removed artifacts/arx_node_Ec3U_GGCN.json
+Removed artifacts/arx_ata_recovery_peer_4.json
+Removed artifacts/executing_pool_acc.json
+Removed artifacts/operator_acc_79xa_CmR7.json
+Removed artifacts/cluster_acc_0.json
+Removed artifacts/wallet_acc_callback_recovery_peer_4.json
+Removed artifacts/arx_node_recovery_peer_4.json
+Removed artifacts/wallet_acc_79xa_CmR7.json
+Removed artifacts/arx_ata_79xa_CmR7.json
+Removed artifacts/wallet_acc_recovery_peer_4.json
+Removed artifacts/arx_ata_recovery_peer_1.json
+Removed artifacts/operator_acc_recovery_peer_0.json
+Removed artifacts/arx_mint.json
+Removed artifacts/wallet_acc_recovery_peer_3.json
+Removed artifacts/mempool_acc.json
+Removed artifacts/wallet_acc_callback_recovery_peer_2.json
+Removed artifacts/arx_node_recovery_peer_3.json
+Removed artifacts/wallet_acc_Ec3U_GGCN.json
+Removed artifacts/reveal_result_raw_circuit_0.json
+Removed artifacts/arx_node_recovery_peer_2.json
+Removed artifacts/mxe_acc.json
+Removed artifacts/arx_ata_Ec3U_GGCN.json
+Removed artifacts/wallet_acc_callback_recovery_peer_3.json
+Removed artifacts/mxe_keygen_comp_def.json
+Removed artifacts/wallet_acc_recovery_peer_2.json
+Removed artifacts/recovery_cluster_acc.json
+Removed artifacts/operator_acc_recovery_peer_1.json
+Removed artifacts/arx_ata_recovery_peer_0.json
+Clean completed successfully!
+Syncing program ids for the configured cluster (localnet)
+
+Found incorrect program id declaration in "/Users/mike/Code/arcium-election/programs/election/src/lib.rs"
+Updated to 7b3qAuNdW3qt1CRpspwoSv6CKeE568xabAK9im2jgEFc
+
+Found incorrect program id declaration in Anchor.toml for the program `election`
+Updated to 7b3qAuNdW3qt1CRpspwoSv6CKeE568xabAK9im2jgEFc
+
+All program id declarations are synced.
+Please rebuild the program to update the generated artifacts.
+Checking if encrypted instructions are up to date.
+Encrypted instructions are up to date. Skipping build.
+   Compiling proc-macro2 v1.0.106
+   Compiling quote v1.0.44
+   Compiling unicode-ident v1.0.23
+   Compiling version_check v0.9.5
+   Compiling typenum v1.19.0
+   Compiling serde_core v1.0.228
+   Compiling serde v1.0.228
+   Compiling syn v1.0.109
+   Compiling autocfg v1.5.0
+   Compiling cfg-if v1.0.4
+   Compiling hashbrown v0.16.1
+   Compiling winnow v0.7.14
+   Compiling equivalent v1.0.2
+   Compiling toml_datetime v0.7.5+spec-1.1.0
+   Compiling solana-define-syscall v2.3.0
+   Compiling subtle v2.6.1
+   Compiling cfg_aliases v0.2.1
+   Compiling borsh v1.6.0
+   Compiling once_cell v1.21.3
+   Compiling generic-array v0.14.7
+   Compiling indexmap v2.13.0
+   Compiling zmij v1.0.21
+   Compiling five8_core v0.1.2
+   Compiling zerocopy v0.8.39
+   Compiling num-traits v0.2.19
+   Compiling ahash v0.8.12
+   Compiling serde_json v1.0.149
+   Compiling five8 v0.2.1
+   Compiling solana-sanitize v2.2.1
+   Compiling solana-atomic-u64 v2.2.1
+   Compiling five8_const v0.1.4
+   Compiling itoa v1.0.17
+   Compiling toml_parser v1.0.8+spec-1.1.0
+   Compiling memchr v2.8.0
+   Compiling syn v2.0.115
+   Compiling toml_edit v0.23.10+spec-1.0.0
+   Compiling libc v0.2.182
+   Compiling proc-macro-crate v3.4.0
+   Compiling solana-msg v2.2.1
+   Compiling bs58 v0.5.1
+   Compiling thiserror v1.0.69
+   Compiling solana-program-memory v2.3.1
+   Compiling thiserror v2.0.18
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling digest v0.10.7
+   Compiling solana-decode-error v2.3.0
+   Compiling sha2 v0.10.9
+   Compiling keccak v0.1.6
+   Compiling rustversion v1.0.22
+   Compiling unicode-segmentation v1.12.0
+   Compiling anyhow v1.0.101
+   Compiling solana-program-option v2.2.1
+   Compiling rand_core v0.6.4
+   Compiling byteorder v1.5.0
+   Compiling cpufeatures v0.2.17
+   Compiling heck v0.3.3
+   Compiling base64 v0.22.1
+   Compiling feature-probe v0.1.1
+   Compiling log v0.4.29
+   Compiling bv v0.11.1
+   Compiling arrayref v0.3.9
+   Compiling find-msvc-tools v0.1.9
+   Compiling lazy_static v1.5.0
+   Compiling shlex v1.3.0
+   Compiling serde_bytes v0.11.19
+   Compiling arrayvec v0.7.6
+   Compiling num-modular v0.6.1
+   Compiling cc v1.2.56
+   Compiling static_assertions v1.1.0
+   Compiling constant_time_eq v0.3.1
+   Compiling dashu-base v0.4.1
+   Compiling num-integer v0.1.46
+   Compiling memoffset v0.9.1
+   Compiling paste v1.0.15
+   Compiling sha3 v0.10.8
+   Compiling num-order v1.2.0
+   Compiling dashu-int v0.4.1
+   Compiling allocator-api2 v0.2.21
+   Compiling borsh-derive-internal v0.10.4
+   Compiling borsh-schema-derive-internal v0.10.4
+   Compiling solana-native-token v2.3.0
+   Compiling foldhash v0.1.5
+   Compiling num-bigint v0.4.6
+   Compiling hashbrown v0.15.2
+   Compiling solana-big-mod-exp v2.2.1
+   Compiling getrandom v0.2.17
+   Compiling num-iter v0.1.45
+   Compiling num-complex v0.4.6
+   Compiling base64 v0.21.7
+   Compiling keccak-const v0.2.0
+   Compiling solana-security-txt v1.1.2
+   Compiling solana-nostd-sha256 v0.1.3
+   Compiling sha2-const-stable v0.1.0
+   Compiling convert_case v0.8.0
+   Compiling const-crypto v0.3.0
+   Compiling hashbrown v0.13.2
+   Compiling num-rational v0.4.2
+   Compiling num v0.4.3
+   Compiling dashu-float v0.4.3
+   Compiling dashu-ratio v0.4.1
+   Compiling blake3 v1.8.2
+   Compiling dashu-macros v0.4.1
+   Compiling dashu v0.4.2
+   Compiling anchor-derive-space v0.32.1
+   Compiling serde_derive v1.0.228
+   Compiling bytemuck_derive v1.10.2
+   Compiling borsh-derive v1.6.0
+   Compiling thiserror-impl v1.0.69
+   Compiling thiserror-impl v2.0.18
+   Compiling solana-sdk-macro v2.2.1
+   Compiling num-derive v0.4.2
+   Compiling zeroize_derive v1.4.3
+   Compiling spl-program-error-derive v0.5.0
+   Compiling num_enum_derive v0.7.5
+   Compiling zeroize v1.8.2
+   Compiling merlin v3.0.0
+   Compiling num_enum v0.7.5
+   Compiling spl-discriminator-syn v0.2.1
+   Compiling solana-secp256k1-recover v2.2.1
+   Compiling bytemuck v1.25.0
+   Compiling spl-discriminator-derive v0.2.0
+   Compiling solana-curve25519 v2.3.13
+   Compiling solana-bn254 v2.2.2
+   Compiling solana-alt-bn128-bls v0.1.0
+   Compiling solana-hash v2.3.0
+   Compiling bincode v1.3.3
+   Compiling solana-fee-calculator v2.2.1
+   Compiling solana-short-vec v2.2.1
+   Compiling solana-serde-varint v2.2.2
+   Compiling toml v0.5.11
+   Compiling anchor-syn v0.32.1
+   Compiling anchor-lang-idl-spec v0.1.0
+   Compiling arcis-interface v0.8.3
+   Compiling solana-sha256-hasher v2.3.0
+   Compiling solana-keccak-hasher v2.2.1
+   Compiling solana-blake3-hasher v2.2.1
+   Compiling anchor-lang-idl v0.1.2
+   Compiling proc-macro-crate v0.1.5
+   Compiling arcium-macros v0.8.3
+   Compiling borsh-derive v0.10.4
+   Compiling borsh v0.10.4
+   Compiling solana-pubkey v2.4.0
+   Compiling solana-borsh v2.2.1
+   Compiling solana-instruction v2.3.3
+   Compiling solana-sdk-ids v2.2.1
+   Compiling solana-nonce v2.2.1
+   Compiling solana-sysvar-id v2.2.1
+   Compiling solana-clock v2.2.3
+   Compiling solana-rent v2.2.1
+   Compiling solana-slot-hashes v2.2.1
+   Compiling solana-epoch-schedule v2.2.1
+   Compiling solana-epoch-rewards v2.2.1
+   Compiling solana-slot-history v2.2.1
+   Compiling solana-last-restart-slot v2.2.1
+   Compiling solana-program-error v2.2.2
+   Compiling solana-system-interface v1.0.0
+   Compiling solana-stable-layout v2.2.1
+   Compiling solana-serialize-utils v2.2.1
+   Compiling solana-zk-sdk v2.3.13
+   Compiling solana-account-info v2.3.0
+   Compiling solana-program-pack v2.2.1
+   Compiling spl-discriminator v0.4.1
+   Compiling spl-program-error v0.7.0
+   Compiling solana-transaction-error v2.2.1
+   Compiling solana-cpi v2.2.1
+   Compiling solana-program-entrypoint v2.3.0
+   Compiling solana-instructions-sysvar v2.2.2
+   Compiling solana-account v2.2.1
+   Compiling solana-bincode v2.2.1
+   Compiling solana-stake-interface v1.2.1
+   Compiling solana-vote-interface v2.2.6
+   Compiling solana-message v2.4.0
+   Compiling solana-address-lookup-table-interface v2.2.2
+   Compiling solana-loader-v4-interface v2.2.1
+   Compiling solana-feature-gate-interface v2.2.2
+   Compiling solana-loader-v3-interface v5.0.0
+   Compiling solana-loader-v2-interface v2.2.1
+   Compiling spl-memo v6.0.0
+   Compiling solana-invoke v0.4.0
+   Compiling solana-loader-v3-interface v3.0.0
+   Compiling spl-associated-token-account-client v2.0.0
+   Compiling solana-sysvar v2.3.0
+   Compiling spl-pod v0.5.1
+   Compiling spl-token-confidential-transfer-ciphertext-arithmetic v0.3.1
+   Compiling spl-type-length-value v0.8.0
+   Compiling spl-token-confidential-transfer-proof-extraction v0.3.0
+   Compiling spl-token-group-interface v0.6.0
+   Compiling spl-tlv-account-resolution v0.10.0
+   Compiling spl-token-metadata-interface v0.7.0
+   Compiling spl-token v8.0.0
+   Compiling spl-elgamal-registry v0.2.0
+   Compiling spl-transfer-hook-interface v0.10.0
+   Compiling spl-token-2022 v8.0.1
+   Compiling solana-program v2.3.0
+   Compiling anchor-derive-serde v0.32.1
+   Compiling anchor-attribute-constant v0.32.1
+   Compiling anchor-attribute-account v0.32.1
+   Compiling anchor-attribute-access-control v0.32.1
+   Compiling anchor-attribute-event v0.32.1
+   Compiling anchor-derive-accounts v0.32.1
+   Compiling anchor-attribute-error v0.32.1
+   Compiling spl-associated-token-account v7.0.0
+   Compiling anchor-attribute-program v0.32.1
+   Compiling anchor-lang v0.32.1
+   Compiling arcium-client v0.8.3
+   Compiling anchor-spl v0.32.1
+   Compiling arcium-anchor v0.8.3
+Error: Function _ZN109_$LT$arcium_client..idl..arcium..utils..Account$u20$as$u20$core..convert..TryFrom$LT$$RF$$u5b$u8$u5d$$GT$$GT$8try_from17he10b0bda9974e590E Stack offset of 721512 exceeded max offset of 4096 by 717416 bytes, please minimize large stack variables. Estimated function frame size: 721536 bytes. Exceeding the maximum stack offset may cause undefined behavior during execution.
+
+   Compiling election v0.1.0 (/Users/mike/Code/arcium-election/programs/election)
+    Finished `release` profile [optimized] target(s) in 33.63s
+   Compiling proc-macro2 v1.0.106
+   Compiling unicode-ident v1.0.23
+   Compiling quote v1.0.44
+   Compiling cfg-if v1.0.4
+   Compiling version_check v0.9.5
+   Compiling typenum v1.19.0
+   Compiling libc v0.2.182
+   Compiling autocfg v1.5.0
+   Compiling subtle v2.6.1
+   Compiling equivalent v1.0.2
+   Compiling syn v1.0.109
+   Compiling serde_core v1.0.228
+   Compiling zerocopy v0.8.39
+   Compiling serde v1.0.228
+   Compiling winnow v0.7.14
+   Compiling hashbrown v0.16.1
+   Compiling generic-array v0.14.7
+   Compiling num-traits v0.2.19
+   Compiling indexmap v2.13.0
+   Compiling ahash v0.8.12
+   Compiling once_cell v1.21.3
+   Compiling toml_datetime v0.7.5+spec-1.1.0
+   Compiling cfg_aliases v0.2.1
+   Compiling borsh v1.6.0
+   Compiling toml_parser v1.0.8+spec-1.1.0
+   Compiling five8_core v0.1.2
+   Compiling memchr v2.8.0
+   Compiling zmij v1.0.21
+   Compiling toml_edit v0.23.10+spec-1.0.0
+   Compiling five8 v0.2.1
+   Compiling solana-sanitize v2.2.1
+   Compiling semver v1.0.27
+   Compiling serde_json v1.0.149
+   Compiling proc-macro-crate v3.4.0
+   Compiling rustc_version v0.4.1
+   Compiling itoa v1.0.17
+   Compiling syn v2.0.115
+   Compiling solana-atomic-u64 v2.2.1
+   Compiling five8_const v0.1.4
+   Compiling curve25519-dalek v4.1.3
+   Compiling bs58 v0.5.1
+   Compiling solana-msg v2.2.1
+   Compiling either v1.15.0
+   Compiling thiserror v2.0.18
+   Compiling thiserror v1.0.69
+   Compiling getrandom v0.2.17
+   Compiling rand_core v0.6.4
+   Compiling cpufeatures v0.2.17
+   Compiling lazy_static v1.5.0
+   Compiling solana-program-memory v2.3.1
+   Compiling opaque-debug v0.3.1
+   Compiling keccak v0.1.6
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling digest v0.10.7
+   Compiling sha2 v0.10.9
+   Compiling base64 v0.22.1
+   Compiling sha3 v0.10.8
+   Compiling inout v0.1.4
+   Compiling anyhow v1.0.101
+   Compiling cipher v0.4.4
+   Compiling rustversion v1.0.22
+   Compiling solana-decode-error v2.3.0
+   Compiling num-integer v0.1.46
+   Compiling percent-encoding v2.3.2
+   Compiling fnv v1.0.7
+   Compiling uriparse v0.6.4
+   Compiling num-bigint v0.4.6
+   Compiling qstring v0.7.2
+   Compiling universal-hash v0.5.1
+   Compiling derivation-path v0.2.0
+   Compiling ppv-lite86 v0.2.21
+   Compiling hashbrown v0.13.2
+   Compiling unicode-segmentation v1.12.0
+   Compiling solana-derivation-path v2.2.1
+   Compiling rand_chacha v0.3.1
+   Compiling borsh-derive-internal v0.10.4
+   Compiling borsh-schema-derive-internal v0.10.4
+   Compiling rand v0.8.5
+   Compiling polyval v0.6.2
+   Compiling ctr v0.9.2
+   Compiling aes v0.8.4
+   Compiling pbkdf2 v0.11.0
+   Compiling hmac v0.12.1
+   Compiling aead v0.5.2
+   Compiling solana-signature v2.3.0
+   Compiling toml_write v0.1.2
+   Compiling solana-program-option v2.2.1
+   Compiling byteorder v1.5.0
+   Compiling paste v1.0.15
+   Compiling solana-seed-phrase v2.2.1
+   Compiling solana-seed-derivable v2.2.1
+   Compiling itertools v0.12.1
+   Compiling arrayvec v0.7.6
+   Compiling crunchy v0.2.4
+   Compiling heck v0.3.3
+   Compiling arrayref v0.3.9
+   Compiling feature-probe v0.1.1
+   Compiling log v0.4.29
+   Compiling digest v0.9.0
+   Compiling shlex v1.3.0
+   Compiling bitflags v2.11.0
+   Compiling getrandom v0.1.16
+   Compiling num-modular v0.6.1
+   Compiling bv v0.11.1
+   Compiling find-msvc-tools v0.1.9
+   Compiling cc v1.2.56
+   Compiling static_assertions v1.1.0
+   Compiling foldhash v0.1.5
+   Compiling allocator-api2 v0.2.21
+   Compiling serde_bytes v0.11.19
+   Compiling ark-std v0.4.0
+   Compiling ark-serialize-derive v0.4.2
+   Compiling constant_time_eq v0.3.1
+   Compiling ark-ff-asm v0.4.2
+   Compiling derivative v2.2.0
+   Compiling ark-std v0.5.0
+   Compiling hashbrown v0.15.2
+   Compiling serde_derive v1.0.228
+   Compiling zeroize_derive v1.4.3
+   Compiling bytemuck_derive v1.10.2
+   Compiling borsh-derive v1.6.0
+   Compiling thiserror-impl v2.0.18
+   Compiling thiserror-impl v1.0.69
+   Compiling solana-sdk-macro v2.2.1
+   Compiling num-derive v0.4.2
+   Compiling libsecp256k1-core v0.2.2
+   Compiling rand_core v0.5.1
+   Compiling zeroize v1.8.2
+   Compiling blake3 v1.8.2
+   Compiling enum-ordinalize-derive v4.3.2
+   Compiling rand_chacha v0.2.2
+   Compiling ark-serialize v0.4.2
+   Compiling libsecp256k1-gen-genmult v0.2.1
+   Compiling aes-gcm-siv v0.11.1
+   Compiling merlin v3.0.0
+   Compiling libsecp256k1-gen-ecmult v0.2.1
+   Compiling ark-ff-macros v0.4.2
+   Compiling ark-serialize-derive v0.5.0
+   Compiling bytemuck v1.25.0
+   Compiling libsecp256k1 v0.6.0
+   Compiling block-buffer v0.9.0
+   Compiling itertools v0.10.5
+   Compiling enum-ordinalize v4.3.2
+   Compiling dashu-base v0.4.1
+   Compiling sha2 v0.9.9
+   Compiling dashu-int v0.4.1
+   Compiling ark-ff-macros v0.5.0
+   Compiling ark-serialize v0.5.0
+   Compiling rand v0.7.3
+   Compiling ark-ff v0.4.2
+   Compiling spl-program-error-derive v0.5.0
+   Compiling ark-ff-asm v0.5.0
+   Compiling educe v0.6.0
+   Compiling num-order v1.2.0
+   Compiling itertools v0.13.0
+   Compiling aho-corasick v1.1.4
+   Compiling memoffset v0.9.1
+   Compiling solana-define-syscall v2.3.0
+   Compiling regex-syntax v0.8.9
+   Compiling spl-discriminator-syn v0.2.1
+   Compiling spl-discriminator-derive v0.2.0
+   Compiling base64 v0.12.3
+   Compiling num_enum_derive v0.7.5
+   Compiling solana-native-token v2.3.0
+   Compiling solana-big-mod-exp v2.2.1
+   Compiling solana-security-txt v1.1.2
+   Compiling anchor-derive-space v0.32.1
+   Compiling num-rational v0.4.2
+   Compiling regex-automata v0.4.14
+   Compiling num_enum v0.7.5
+   Compiling num-iter v0.1.45
+   Compiling ark-ff v0.5.0
+   Compiling num-complex v0.4.6
+   Compiling base64 v0.21.7
+   Compiling solana-nostd-sha256 v0.1.3
+   Compiling keccak-const v0.2.0
+   Compiling num v0.4.3
+   Compiling sha2-const-stable v0.1.0
+   Compiling convert_case v0.8.0
+   Compiling const-crypto v0.3.0
+   Compiling dashu-ratio v0.4.1
+   Compiling dashu-float v0.4.3
+   Compiling toml v0.5.11
+   Compiling solana-hash v2.3.0
+   Compiling bincode v1.3.3
+   Compiling toml_datetime v0.6.11
+   Compiling solana-sha256-hasher v2.3.0
+   Compiling serde_spanned v0.6.9
+   Compiling solana-fee-calculator v2.2.1
+   Compiling solana-short-vec v2.2.1
+   Compiling solana-keccak-hasher v2.2.1
+   Compiling toml_edit v0.22.27
+   Compiling anchor-lang-idl-spec v0.1.0
+   Compiling solana-serde-varint v2.2.2
+   Compiling solana-blake3-hasher v2.2.1
+   Compiling dashu-macros v0.4.1
+   Compiling arcis-interface v0.8.3
+   Compiling solana-curve25519 v2.3.13
+   Compiling proc-macro-crate v0.1.5
+   Compiling regex v1.12.3
+   Compiling arcium-macros v0.8.3
+   Compiling anchor-lang-idl v0.1.2
+   Compiling borsh-derive v0.10.4
+   Compiling borsh v0.10.4
+   Compiling dashu v0.4.2
+   Compiling toml v0.8.23
+   Compiling cargo_toml v0.19.2
+   Compiling solana-pubkey v2.4.0
+   Compiling solana-borsh v2.2.1
+   Compiling solana-secp256k1-recover v2.2.1
+   Compiling solana-instruction v2.3.3
+   Compiling solana-sdk-ids v2.2.1
+   Compiling solana-nonce v2.2.1
+   Compiling solana-sysvar-id v2.2.1
+   Compiling solana-clock v2.2.3
+   Compiling solana-rent v2.2.1
+   Compiling solana-slot-hashes v2.2.1
+   Compiling solana-slot-history v2.2.1
+   Compiling solana-epoch-rewards v2.2.1
+   Compiling solana-last-restart-slot v2.2.1
+   Compiling solana-epoch-schedule v2.2.1
+   Compiling solana-program-error v2.2.2
+   Compiling solana-transaction-error v2.2.1
+   Compiling solana-system-interface v1.0.0
+   Compiling solana-serialize-utils v2.2.1
+   Compiling solana-account-info v2.3.0
+   Compiling solana-signer v2.2.1
+   Compiling solana-program-pack v2.2.1
+   Compiling spl-discriminator v0.4.1
+   Compiling solana-bincode v2.2.1
+   Compiling solana-stable-layout v2.2.1
+   Compiling spl-program-error v0.7.0
+   Compiling solana-cpi v2.2.1
+   Compiling solana-program-entrypoint v2.3.0
+   Compiling solana-zk-sdk v2.3.13
+   Compiling anchor-syn v0.32.1
+   Compiling solana-instructions-sysvar v2.2.2
+   Compiling solana-message v2.4.0
+   Compiling solana-stake-interface v1.2.1
+   Compiling solana-account v2.2.1
+   Compiling solana-address-lookup-table-interface v2.2.2
+   Compiling solana-vote-interface v2.2.6
+   Compiling solana-loader-v3-interface v5.0.0
+   Compiling solana-loader-v4-interface v2.2.1
+   Compiling solana-feature-gate-interface v2.2.2
+   Compiling solana-loader-v2-interface v2.2.1
+   Compiling spl-memo v6.0.0
+   Compiling solana-invoke v0.4.0
+   Compiling solana-loader-v3-interface v3.0.0
+   Compiling spl-associated-token-account-client v2.0.0
+   Compiling solana-example-mocks v2.2.1
+   Compiling solana-sysvar v2.3.0
+   Compiling spl-token v8.0.0
+   Compiling solana-program v2.3.0
+   Compiling ark-poly v0.4.2
+   Compiling ark-poly v0.5.0
+   Compiling ark-ec v0.4.2
+   Compiling spl-pod v0.5.1
+   Compiling spl-token-confidential-transfer-proof-generation v0.4.1
+   Compiling spl-token-confidential-transfer-ciphertext-arithmetic v0.3.1
+   Compiling anchor-attribute-access-control v0.32.1
+   Compiling anchor-attribute-error v0.32.1
+   Compiling anchor-attribute-program v0.32.1
+   Compiling anchor-attribute-constant v0.32.1
+   Compiling anchor-derive-accounts v0.32.1
+   Compiling anchor-derive-serde v0.32.1
+   Compiling anchor-attribute-account v0.32.1
+   Compiling anchor-attribute-event v0.32.1
+   Compiling spl-type-length-value v0.8.0
+   Compiling spl-token-confidential-transfer-proof-extraction v0.3.0
+   Compiling spl-token-group-interface v0.6.0
+   Compiling ark-ec v0.5.0
+   Compiling spl-elgamal-registry v0.2.0
+   Compiling spl-tlv-account-resolution v0.10.0
+   Compiling spl-token-metadata-interface v0.7.0
+   Compiling anchor-lang v0.32.1
+   Compiling spl-transfer-hook-interface v0.10.0
+   Compiling ark-bn254 v0.4.0
+   Compiling spl-token-2022 v8.0.1
+   Compiling solana-bn254 v2.2.2
+   Compiling ark-bn254 v0.5.0
+   Compiling solana-alt-bn128-bls v0.1.0
+   Compiling spl-associated-token-account v7.0.0
+   Compiling anchor-spl v0.32.1
+   Compiling arcium-client v0.8.3
+   Compiling arcium-anchor v0.8.3
+   Compiling election v0.1.0 (/Users/mike/Code/arcium-election/programs/election)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.27s
+     Running unittests src/lib.rs (/Users/mike/Code/arcium-election/target/debug/deps/election-54a59f3cce89f3f5)
+🔍 Searching for IDL files in target/idl...
+📦 Found 1 IDL file(s)
+✅ Generated client for election at dist/election-client
+
+🎉 Successfully generated 1 client(s)
+Syncing program keys... (use --skip-keys-sync to skip)
+Clean completed successfully!
+Syncing program ids for the configured cluster (localnet)
+
+All program id declarations are synced.
+Checking if encrypted instructions are up to date.
+Encrypted instructions are up to date. Skipping build.
+Error: Function _ZN109_$LT$arcium_client..idl..arcium..utils..Account$u20$as$u20$core..convert..TryFrom$LT$$RF$$u5b$u8$u5d$$GT$$GT$8try_from17he10b0bda9974e590E Stack offset of 721512 exceeded max offset of 4096 by 717416 bytes, please minimize large stack variables. Estimated function frame size: 721536 bytes. Exceeding the maximum stack offset may cause undefined behavior during execution.
+
+    Finished `release` profile [optimized] target(s) in 0.27s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.14s
+     Running unittests src/lib.rs (/Users/mike/Code/arcium-election/target/debug/deps/election-54a59f3cce89f3f5)
+Clean completed successfully!
+Generating accounts with owner pubkey: DoTnmxgVKiReLgR5VDGTDUu4WZLTnRN4NC3MF9PnV1iV
+Lighthouse program already exists at artifacts/lighthouse.so
+Creating genesis accounts...
+Added lighthouse program to genesis accounts
+Starting anchor localnet...
+Waiting for solana localnet to come online at http://127.0.0.1:8899...
+Solana localnet is online.
+Starting Arcium node(s)...
+Waiting for the arcium nodes to come online...
+Primary cluster nodes are online.
+Solana localnet & Arx nodes are online.
+Starting anchor test...
+
+Found a 'test' script in the Anchor.toml. Running it as a test suite!
+
+Running test suite: "/Users/mike/Code/arcium-election/Anchor.toml"
+
+▶ Election
+  ✖ users can vote on polls without revealing their choices!
+✖ Election (1061533.544333ms)
+ℹ tests 1
+ℹ suites 1
+ℹ pass 0
+ℹ fail 0
+ℹ cancelled 1
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1061535.454959
+
+✖ failing tests:
+
+test at tests/election.ts:1:3415
+✖ users can vote on polls without revealing their choices!
+  'test did not finish before its parent and was cancelled'
+
+test at tests/election.ts:1:1323
+✖ Election (1061533.544333ms)
+  TypeError: fetch failed
+      at node:internal/deps/undici/undici:15422:13
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async makeHttpRequest (/Users/mike/Code/arcium-election/node_modules/@solana/rpc-transport-http/src/http-transport.ts:69:26)
+      at async <anonymous> (/Users/mike/Code/arcium-election/node_modules/@solana/rpc/src/rpc-request-coalescer.ts:53:28)
+      at async makeCoalescedHttpRequest (/Users/mike/Code/arcium-election/node_modules/@solana/rpc/src/rpc-request-coalescer.ts:99:21)
+      at async Object.execute (/Users/mike/Code/arcium-election/node_modules/@solana/rpc-spec/src/rpc-api.ts:126:42)
+      at async Object.send (/Users/mike/Code/arcium-election/node_modules/@solana/rpc-spec/src/rpc.ts:100:20)
+      at async Object.sendTransactionFromInstructions (/Users/mike/Code/arcium-election/node_modules/solana-kite/dist/index.js:481:27)
+      at async initCompDef (/Users/mike/Code/arcium-election/tests/election.ts:407:30)
+      at async SuiteContext.<anonymous> (/Users/mike/Code/arcium-election/tests/election.ts:92:5) {
+    [cause]: AggregateError [ECONNREFUSED]: 
+        at internalConnectMultiple (node:net:1134:18)
+        at afterConnectMultiple (node:net:1715:7) {
+      code: 'ECONNREFUSED',
+      [errors]: [ [Error], [Error] ]
+    }
+  }
+ Container artifacts-arx-node-0-1  Stopping
+ Container artifacts-arcium-trusted-dealer-1  Stopping
+ Container artifacts-arx-node-1-1  Stopping
+ Container artifacts-arx-node-1-1  Stopped
+ Container artifacts-arcium-trusted-dealer-1  Stopped
+ Container artifacts-arx-node-0-1  Stopped
+Cleanup completed.
+Error: Test failed - check the output above for details

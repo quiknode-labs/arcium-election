@@ -22,13 +22,15 @@ set -euo pipefail
 
 # Set Arcium version for local development
 if command -v arcup &> /dev/null; then
-  arcup use 0.6.6
+  arcup use 0.8.3
 fi
 
-# TODO: Upgrade to Agave 3.x when resolved
-# Currently using Agave 2.3.11 due to Agave 3.x panic with bind-address 0.0.0.0
-# See: https://solana.stackexchange.com/questions/23807/anchor-localnet-wont-start-local-validator-panicked-  at-unspecifiedipaddr
-# Agave 3.x throws: UnspecifiedIpAddr(0.0.0.0) panic when Arcium tries to bind validator to 0.0.0.0
+# Agave 3.x compatibility blocked (tested with 3.1.8 on Arcium 0.8.3)
+# Currently using Agave 2.3.13. Agave 3.x panics with bind-address 0.0.0.0:
+# "thread 'main' panicked at gossip/src/node.rs:297:59:
+#  called `Result::unwrap()` on an `Err` value: UnspecifiedIpAddr(0.0.0.0)"
+# See: https://solana.stackexchange.com/questions/23807/anchor-localnet-wont-start-local-validator-panicked-at-unspecifiedipaddr
+# This occurs when Arcium's test setup tries to bind the validator to 0.0.0.0.
 
 # Set correct Anchor version (only if avm is available)
 if command -v avm &> /dev/null; then
