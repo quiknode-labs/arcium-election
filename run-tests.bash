@@ -22,7 +22,7 @@ set -euo pipefail
 
 # Set Arcium version for local development
 if command -v arcup &> /dev/null; then
-  arcup use 0.8.3
+  arcup use 0.8.5
 fi
 
 # Agave 3.x compatibility blocked (tested with 3.1.8 on Arcium 0.8.3)

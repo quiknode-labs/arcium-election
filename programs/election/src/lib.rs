@@ -138,10 +138,6 @@ pub mod election {
         )]
         pub comp_def_account: Account<'info, ComputationDefinitionAccount>,
 
-        #[account(address = ::anchor_lang::solana_program::sysvar::instructions::ID)]
-        /// CHECK: instructions_sysvar, checked by the account constraint
-        pub instructions_sysvar: AccountInfo<'info>,
-
         #[account(address = derive_mxe_pda!())]
         pub mxe_account: Account<'info, MXEAccount>,
 
@@ -150,6 +146,10 @@ pub mod election {
 
         #[account(address = derive_cluster_pda!(mxe_account, ErrorCode::ClusterNotSet))]
         pub cluster_account: Account<'info, Cluster>,
+
+        #[account(address = ::anchor_lang::solana_program::sysvar::instructions::ID)]
+        /// CHECK: instructions_sysvar, checked by the account constraint
+        pub instructions_sysvar: AccountInfo<'info>,
 
         /// CHECK: poll_account, checked by the callback account key passed in queue_computation
         #[account(mut)]
@@ -360,10 +360,6 @@ pub mod election {
         )]
         pub comp_def_account: Account<'info, ComputationDefinitionAccount>,
 
-        #[account(address = ::anchor_lang::solana_program::sysvar::instructions::ID)]
-        /// CHECK: instructions_sysvar, checked by the account constraint
-        pub instructions_sysvar: AccountInfo<'info>,
-
         #[account(address = derive_mxe_pda!())]
         pub mxe_account: Account<'info, MXEAccount>,
 
@@ -372,6 +368,10 @@ pub mod election {
 
         #[account(address = derive_cluster_pda!(mxe_account, ErrorCode::ClusterNotSet))]
         pub cluster_account: Account<'info, Cluster>,
+
+        #[account(address = ::anchor_lang::solana_program::sysvar::instructions::ID)]
+        /// CHECK: instructions_sysvar, checked by the account constraint
+        pub instructions_sysvar: AccountInfo<'info>,
 
         #[account(mut)]
         pub poll_account: Account<'info, Poll>,
@@ -493,10 +493,6 @@ pub mod election {
         )]
         pub comp_def_account: Account<'info, ComputationDefinitionAccount>,
 
-        #[account(address = ::anchor_lang::solana_program::sysvar::instructions::ID)]
-        /// CHECK: instructions_sysvar, checked by the account constraint
-        pub instructions_sysvar: AccountInfo<'info>,
-
         #[account(address = derive_mxe_pda!())]
         pub mxe_account: Account<'info, MXEAccount>,
 
@@ -505,6 +501,10 @@ pub mod election {
 
         #[account(address = derive_cluster_pda!(mxe_account, ErrorCode::ClusterNotSet))]
         pub cluster_account: Account<'info, Cluster>,
+
+        #[account(address = ::anchor_lang::solana_program::sysvar::instructions::ID)]
+        /// CHECK: instructions_sysvar, checked by the account constraint
+        pub instructions_sysvar: AccountInfo<'info>,
     }
 }
 

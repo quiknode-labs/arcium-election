@@ -314,9 +314,9 @@ checksum = "5f0e0fee31ef5ed1ba1316088939cea399010ed7731dba877ed44aeb407a75ea"
 
 [[package]]
 name = "arcis"
-version = "0.8.3"
+version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3385304c5e9372df1aeb63365660e1dd4aba237aabd12601694112d1147e7625"
+checksum = "23ab100817276fade847516f4c362c640adaa42f098a0277eeafe0863872e269"
 dependencies = [
  "arcis-compiler",
  "arcis-interpreter-proc-macros",
@@ -329,9 +329,9 @@ dependencies = [
 
 [[package]]
 name = "arcis-compiler"
-version = "0.8.3"
+version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a94104756f071ab8eca8f200be86328adcf6499bf56e887d80a7c091a8c524fe"
+checksum = "edd4705d16680881c7f38e3a4204edb7dd1fe232365d470db89ec9ae79dcad4e"
 dependencies = [
  "aes",
  "arcis-interface",
@@ -373,9 +373,9 @@ dependencies = [
 
 [[package]]
 name = "arcis-interface"
-version = "0.8.3"
+version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "70b9f6dbaf71116970b5da59068daa606cecba3a9f8a0de50d17c98f3541fd32"
+checksum = "b1db092a47ae2633dc02a47d93c2fb058799fc2b7c90be8e33606b1309d47bd1"
 dependencies = [
  "serde",
  "serde_json",
@@ -383,9 +383,9 @@ dependencies = [
 
 [[package]]
 name = "arcis-internal-expr-macro"
-version = "0.8.3"
+version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ede270c49bad0d1dbb9cd8bf2f0ee749c84d1cf99ce0fd50fa1ff5e0b0e6ab4a"
+checksum = "4912386061abb8c1f82e236061df2978dd27ea5a10d2c5d16f5d0ab0dd2c886a"
 dependencies = [
  "indexmap 2.13.0",
  "proc-macro2",
@@ -396,9 +396,9 @@ dependencies = [
 
 [[package]]
 name = "arcis-interpreter"
-version = "0.8.3"
+version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d3c0ba16d83c8a435bf63952d1fbf8803ab4766fa60627edb9fe19a3e2aeb466"
+checksum = "27d6eb893dccd50d45b3dc8f8481e52fe22350befe17d90fd77d95cbce33fa77"
 dependencies = [
  "arcis-compiler",
  "arcis-interface",
@@ -416,18 +416,18 @@ dependencies = [
 
 [[package]]
 name = "arcis-interpreter-proc-macros"
-version = "0.8.3"
+version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f4219ff115b099220730a83f8854d4d03032765980f2e0fbeaea277ff2a0863b"
+checksum = "c3bf72e094d59f2989cf1c2c4b45163eb0e76871b06a089559024963186a063d"
 dependencies = [
  "arcis-interpreter",
 ]
 
 [[package]]
 name = "arcium-anchor"
-version = "0.8.3"
+version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e0dc928c647c4a8b9b0869578ff7020e442b9d98ec8d7ed99cd7743b4e4399cb"
+checksum = "a6b6dbd04a58bc3b76da053c8e84267f98528983420668d2cdb6e66ce0cf2b10"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -440,9 +440,9 @@ dependencies = [
 
 [[package]]
 name = "arcium-client"
-version = "0.8.3"
+version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b949c647e5590013f3407dba2196dc4cb7cc5f08722ebee387e4332408e614c"
+checksum = "36a6d1272cbcdd24d9d5556f99926ce13b4e837737843ebc5628679cccbc2680"
 dependencies = [
  "anchor-lang",
  "bytemuck",
@@ -455,9 +455,9 @@ dependencies = [
 
 [[package]]
 name = "arcium-core-utils"
-version = "0.3.0"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7e2d37e52bfecc093df08f1968e1031370fcd2f32226bb5364e2fa04b95621d6"
+checksum = "6c50dfd66d2d01c30ceace2c071eb053540e926938aeb4d9a6be53a3d57ab742"
 dependencies = [
  "arcium-primitives",
  "bincode",
@@ -479,9 +479,9 @@ dependencies = [
 
 [[package]]
 name = "arcium-macros"
-version = "0.8.3"
+version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "069af4a1bb50ce6a1ac7b3c53502ec1a13560e3ddff20f850cb6ab970b1ccaa9"
+checksum = "6063b33cc27f562416abdc43dd28280c3ff50abec676bab250143eb10356dc41"
 dependencies = [
  "arcis-interface",
  "convert_case",
@@ -494,9 +494,9 @@ dependencies = [
 
 [[package]]
 name = "arcium-primitives"
-version = "0.3.0"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "44225d4e71e004f462b512e5f35816af9da66cb8bc7f6a050cf7b65bb02ada08"
+checksum = "70f58487e28685cf6a8cd8775523e8a171eb0f961e79284dfec8f0c6fb863c45"
 dependencies = [
  "aes",
  "ambassador",
@@ -2376,9 +2376,9 @@ dependencies = [
 
 [[package]]
 name = "mpc-macros"
-version = "0.3.2"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "59b742e106110e32d8f26aebb5ee2570ba63bc489b3bff16c6a101a5ff9daf54"
+checksum = "bcbe8b86df3c7fe423f9145cbbe5553fe8df1d9bdc850e317f6532471a6ccb9f"
 dependencies = [
  "itertools 0.12.1",
  "proc-macro2",
